@@ -1,0 +1,12 @@
+<!-- Currently not used, to activate include the week in the anchor for the home.html file-->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ pick.week}} - {{pick.user_name}}</h1>
+<small>{{pick.team}}</small>
+<br/><br/>
+<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+
+{% endblock %}

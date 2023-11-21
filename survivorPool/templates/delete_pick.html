@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Delete Pick{% endblock %}
+{% block content %}
+
+{% if user.is_authenticated %}
+<h1>Delete Pick for Week {{ pick.week }}</h1>
+<br/><br/>
+<h3>Delete: Week {{pick.week}} pick of {{pick.team}} for {{ pick.user_name.first_name }}</h3>
+<br/><br/>
+<form method="POST">
+    {% csrf_token %}
+<button class="btn btn-primary">Delete Pick</button>
+<br/><br/>
+<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+
+{% else %}
+
+You need to be logged in to delete a Pick!
+
+{% endif %}
+
+{% endblock %}
