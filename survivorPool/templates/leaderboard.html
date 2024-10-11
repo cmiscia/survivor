@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load render_table from django_tables2 %}
+{% if user.is_authenticated %}
+    <head>
+        <title>List of picks</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    </head>
+    <body>
+        {% render_table table %}
+    </body>
+
+{% else %} 
+<h1>Login to get started</h1>      
+
+{% endif %}
+
+{% endblock %}

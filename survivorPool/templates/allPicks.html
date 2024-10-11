@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<h1>2024 Survivor Picks</h1>
+<br>
+
+{{df | safe}}   
+
+{% else %} 
+<h1>Login to get started</h1>      
+
+{% endif %}
+
+{% endblock %}

@@ -15,9 +15,16 @@ class Pick(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
     publication_date = models.DateTimeField("date published", default=datetime.now())
     week = models.IntegerField()
+    is_win = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('user_name', 'week')
 
     def __str__(self):
         return str(self.team) + ' | ' + str(self.user_name)
     
     def get_absolute_url(self):
         return reverse('home')
+    
+    
+

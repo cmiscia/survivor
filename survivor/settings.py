@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'survivorPool.apps.SurvivorpoolConfig',
     'members',
+    "django_tables2",
+    "background_task"
 ]
 
 MIDDLEWARE = [
