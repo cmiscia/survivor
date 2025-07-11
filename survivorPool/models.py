@@ -8,14 +8,15 @@ class Team(models.Model):
     is_favorite = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.team_name
+        favorite = " - Is Favorite" if self.is_favorite else " "
+        return str(self.team_name) + favorite
 
 class Pick(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
-    publication_date = models.DateTimeField("date published", default=datetime.now())
+    publication_date = models.DateTimeField("date published", default=datetime.now)
     week = models.IntegerField()
-    is_win = models.BooleanField(default=True)
+    is_win = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('user_name', 'week')
@@ -24,7 +25,7 @@ class Pick(models.Model):
         return str(self.team) + ' | ' + str(self.user_name)
     
     def get_absolute_url(self):
-        return reverse('home')
+        return reverse('home') 
     
     
 

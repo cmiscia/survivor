@@ -12,7 +12,7 @@
                 
                 <li><a href="{% url 'pick_details' pick.pk %}"></a>
                     Week {{pick.week}}: {{ pick.user_name.first_name }}
-                    {{ pick.user_name.last_name }} -  {{ pick.team }}  
+                    {{ pick.user_name.last_name }} -  {{ pick.team.team_name }}  
                     <!-- - <a href="{% url 'edit_pick' pick.id %}" >(Edit)</a>
                     <small><a href="{% url 'delete_pick' pick.pk %}">(Delete)</a></small> -->
                     <br/></li>  

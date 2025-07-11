@@ -54,13 +54,19 @@ class PickView(SingleTableView):
     table_class = PickTable
     template_name = 'leaderboard.html'
 
-def buildPickDataFrame():
+def buildPickDataFrame(max_week=None):
     userMapping = {}
     teamMapping = {}
     pickList = []
     users = list(User.objects.all().values())
-    picks = list(Pick.objects.all().values())
+    # picks = list(Pick.objects.all().values())
     teams = list(Team.objects.all().values())
+
+    # Fetch picks, optionally filter by max_week
+    if max_week is not None:
+        picks = list(Pick.objects.filter(week__lte=max_week).values())
+    else:
+        picks = list(Pick.objects.all().values())
 
     for user in users:
         id = user.get("id")
@@ -87,6 +93,7 @@ def modelToDataFrame(request):
     
     #create leaderboard Note: will only work once there is a pick for first week
     df['Win Count'] = df[df["IsWin"]].groupby("User Name")["IsWin"].transform("sum")
+    df['Win Count'] = df['Win Count'].fillna(0).astype(int)
     dfLeaderBoard = df.loc[df['Week'] == 1, ['User Name', 'Win Count']]
     dfLeaderBoard.sort_values('Win Count')
 
@@ -102,22 +109,48 @@ def modelToDataFrame(request):
 
 def allPicksView(request):
     '''Builds a dataframe to display all picks up to given week'''
-    df = buildPickDataFrame()
+
+    current_nfl_week = 5
+    season_start_date = datetime.datetime(2025, 9, 5).date()
+    if datetime.date.today() < season_start_date:
+        current_nfl_week = 1
+    else:
+        current_nfl_week = get_current_nfl_week(season_start_date)
+
+    df = buildPickDataFrame(max_week=current_nfl_week)
 
     #tweak dataframe to create a view of all picks up to current week sorted by week chronologically
     # df['Combined'] = df['Team'] + '_' + df['IsWin'].astype(str)
     df = df.sort_values(by=['Week'])
-    df = df.pivot(index=['User Name'], columns='Week', values='Team')
+    df['Pick_Display'] = df.apply(
+    lambda row: f"{row['Team']} (W)" if row['IsWin'] else f"{row['Team']} (L)", axis=1)
+    df = df.pivot(index=['User Name'], columns='Week', values='Pick_Display')
     df = df.rename_axis(columns=None).reset_index()
     df = df.fillna("Not Picked")
 
+    df = df.rename(columns=lambda x: f"Week {x}" if isinstance(x, int) else x)
+
     print(df)
+
+    # def style_wins(val):
+    #     color = 'green' if '(W)' in val else 'red'
+    #     return f'color: {color}'
+
+    # styled_df = df.style.applymap(style_wins, subset=pd.IndexSlice[:, df.columns != 'User Name'])
 
     context = {
         'df': df.to_html(classes=["table-bordered", "table-striped", "table-hover"], index=False),
     }
 
     return render(request, 'allPicks.html', context)
+
+def get_current_nfl_week(season_start_date):
+    today = datetime.datetime.now().date()
+    if today < season_start_date:
+        return 0  # preseason or offseason
+    delta = today - season_start_date
+    week = delta.days // 7 + 1
+    return min(week, 18)  # limit to 18 weeks
     
     
 
