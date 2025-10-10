@@ -68,6 +68,12 @@ members/              # User authentication app
 - **Production Server:** Gunicorn
 - **Command:** `gunicorn --bind=0.0.0.0:5000 --reuse-port survivor.wsgi:application`
 
+### Required Environment Variables for Deployment
+Before deploying to production on Replit, you must set these environment variables in the Replit Secrets:
+1. **DJANGO_SECRET_KEY**: Generate a secure secret key (e.g., using `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"`)
+2. **DJANGO_ALLOWED_HOSTS**: Set to `*` for Replit deployments (required for dynamic proxy routing)
+3. **DJANGO_DEBUG**: Set to `False` or leave unset (defaults to False for security)
+
 ## Configuration Notes
 - Database migrations have been applied
 - Static files directory created at `/static/`
