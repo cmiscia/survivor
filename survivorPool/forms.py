@@ -45,6 +45,46 @@ class PostForm(forms.ModelForm):
                 user_name=self.user).values_list('team_id', flat=True)
             available_teams = Team.objects.exclude(id__in=used_team_ids)
             self.fields['team'].queryset = available_teams
+            
+            # Customize team display to show matchup and odds
+            self.fields['team'].label_from_instance = self.team_label
+
+    def team_label(self, team):
+        """Custom label showing team with matchup and betting odds"""
+        if not team.opponent:
+            return str(team.team_name)
+        
+        # Build the label with matchup info
+        label_parts = []
+        
+        # Team name with favorite indicator
+        team_name = str(team.team_name)
+        if team.is_favorite:
+            team_name = f"⭐ {team_name}"
+        
+        # Add opponent
+        location = "vs" if team.is_home else "@"
+        label_parts.append(f"{team_name} ({location} {team.opponent}")
+        
+        # Add spread if available
+        if team.spread and team.is_favorite:
+            label_parts.append(f"-{team.spread}")
+        
+        # Add moneyline if available
+        if team.moneyline:
+            if team.moneyline > 0:
+                label_parts.append(f"+{team.moneyline}")
+            else:
+                label_parts.append(f"{team.moneyline}")
+        
+        label_parts.append(")")
+        
+        # Add game time if available
+        if team.game_time:
+            game_time_str = team.game_time.strftime("%a %I:%M %p")
+            label_parts.append(f"- {game_time_str}")
+        
+        return " ".join(label_parts)
 
     def clean(self):
         cleaned_data = super().clean()
