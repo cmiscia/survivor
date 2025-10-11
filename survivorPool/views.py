@@ -181,14 +181,22 @@ def allPicksView(request):
 
     print(df)
 
-    # def style_wins(val):
-    #     color = 'green' if '(W)' in val else 'red'
-    #     return f'color: {color}'
+    # Style function to add background colors based on pick result
+    def style_picks(val):
+        if '(W)' in str(val):
+            return 'background-color: #d4edda; color: #155724;'  # Green for wins
+        elif '(L)' in str(val):
+            return 'background-color: #f8d7da; color: #721c24;'  # Red for losses
+        elif '(TBD)' in str(val):
+            return 'background-color: #fff3cd; color: #856404;'  # Yellow for TBD
+        else:
+            return ''  # No style for "Not Picked"
 
-    # styled_df = df.style.applymap(style_wins, subset=pd.IndexSlice[:, df.columns != 'User Name'])
+    # Apply styling to all columns except 'User Name'
+    styled_df = df.style.map(style_picks, subset=[col for col in df.columns if col != 'User Name'])
 
     context = {
-        'df': df.to_html(classes=["table-bordered", "table-striped", "table-hover"], index=False),
+        'df': styled_df.to_html(classes=["table-bordered", "table-striped", "table-hover"], index=False),
     }
 
     return render(request, 'allPicks.html', context)
