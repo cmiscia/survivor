@@ -9,7 +9,7 @@
         <div class="picks-list">
             {% for pick in object_list %}
                 {% if user.id == pick.user_name.id %}
-                    <div class="pick-item mb-3 p-3" style="background: white; border-radius: 8px; border-left: 5px solid {% if pick.is_win %}#28a745{% else %}#dc3545{% endif %};">
+                    <div class="pick-item mb-3 p-3" style="background: white; border-radius: 8px; border-left: 5px solid {% if pick.is_win == None %}#ffc107{% elif pick.is_win %}#28a745{% else %}#dc3545{% endif %};">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h4 style="margin: 0; color: #1a4d2e;">
@@ -20,7 +20,11 @@
                                 </small>
                             </div>
                             <div class="text-end">
-                                {% if pick.is_win %}
+                                {% if pick.is_win == None %}
+                                    <span class="badge" style="background-color: #ffc107; font-size: 1rem; padding: 0.5rem 1rem;">
+                                        ⏱ TBD
+                                    </span>
+                                {% elif pick.is_win %}
                                     <span class="badge" style="background-color: #28a745; font-size: 1rem; padding: 0.5rem 1rem;">
                                         ✓ WIN
                                     </span>

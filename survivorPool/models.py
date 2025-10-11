@@ -16,7 +16,7 @@ class Pick(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
     publication_date = models.DateTimeField("date published", default=datetime.now)
     week = models.IntegerField()
-    is_win = models.BooleanField(default=False)
+    is_win = models.BooleanField(null=True, blank=True, default=None)
 
     class Meta:
         unique_together = ('user_name', 'week')
