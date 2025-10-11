@@ -137,7 +137,8 @@ def modelToDataFrame(request):
     df = buildPickDataFrame()
     
     #create leaderboard Note: will only work once there is a pick for first week
-    df['Win Count'] = df[df["IsWin"]].groupby("User Name")["IsWin"].transform("sum")
+    # Handle NULL values - only count True wins, not False or None
+    df['Win Count'] = df[df["IsWin"] == True].groupby("User Name")["IsWin"].transform("sum")
     df['Win Count'] = df['Win Count'].fillna(0).astype(int)
     dfLeaderBoard = df.loc[df['Week'] == 1, ['User Name', 'Win Count']]
     dfLeaderBoard.sort_values('Win Count')
@@ -168,7 +169,7 @@ def allPicksView(request):
     # df['Combined'] = df['Team'] + '_' + df['IsWin'].astype(str)
     df = df.sort_values(by=['Week'])
     df['Pick_Display'] = df.apply(
-    lambda row: f"{row['Team']} (W)" if row['IsWin'] else f"{row['Team']} (L)", axis=1)
+    lambda row: f"{row['Team']} (W)" if row['IsWin'] == True else (f"{row['Team']} (L)" if row['IsWin'] == False else f"{row['Team']} (TBD)"), axis=1)
     df = df.pivot(index=['User Name'], columns='Week', values='Pick_Display')
     df = df.rename_axis(columns=None).reset_index()
     df = df.fillna("Not Picked")
