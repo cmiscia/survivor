@@ -8,8 +8,7 @@ class Team(models.Model):
     is_favorite = models.BooleanField(default=False)
 
     def __str__(self):
-        favorite = " - Is Favorite" if self.is_favorite else " "
-        return str(self.team_name) + favorite
+        return str(self.team_name)
 
 class Pick(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
