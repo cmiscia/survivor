@@ -2,26 +2,45 @@
 
 {% block content %}
 
-
-<ul>
 {% if user.is_authenticated %}
-<h1>Picks for {{ user.username}} </h1>
-        {% for pick in object_list %}
-            {% if user.id == pick.user_name.id %}
-            <ul>
-                
-                <li><a href="{% url 'pick_details' pick.pk %}"></a>
-                    Week {{pick.week}}: {{ pick.user_name.first_name }}
-                    {{ pick.user_name.last_name }} -  {{ pick.team.team_name }}  
-                    <!-- - <a href="{% url 'edit_pick' pick.id %}" >(Edit)</a>
-                    <small><a href="{% url 'delete_pick' pick.pk %}">(Delete)</a></small> -->
-                    <br/></li>  
-            </ul> 
-            {% endif %}
-        {% endfor%}
+    <h1>Picks for {{ user.username }}</h1>
+    
+    {% if object_list %}
+        <div class="picks-list">
+            {% for pick in object_list %}
+                {% if user.id == pick.user_name.id %}
+                    <div class="pick-item mb-3 p-3" style="background: white; border-radius: 8px; border-left: 5px solid {% if pick.is_win %}#28a745{% else %}#dc3545{% endif %};">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 style="margin: 0; color: #1a4d2e;">
+                                    Week {{ pick.week }}: {{ pick.team.team_name }}
+                                </h4>
+                                <small style="color: #6c757d;">
+                                    {{ pick.user_name.first_name }} {{ pick.user_name.last_name }}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                {% if pick.is_win %}
+                                    <span class="badge" style="background-color: #28a745; font-size: 1rem; padding: 0.5rem 1rem;">
+                                        ✓ WIN
+                                    </span>
+                                {% else %}
+                                    <span class="badge" style="background-color: #dc3545; font-size: 1rem; padding: 0.5rem 1rem;">
+                                        ✗ LOSS
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No picks made yet. <a href="{% url 'add_pick' %}">Make your first pick!</a></p>
+    {% endif %}
+    
 {% else %} 
-<h1>Login to get started</h1>      
-
+    <h1>Login to get started</h1>      
 {% endif %}
 
 {% endblock %}
