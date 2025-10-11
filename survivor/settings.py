@@ -54,6 +54,10 @@ CSRF_COOKIE_SECURE = True  # Required for SameSite='None'
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True  # Required for SameSite='None'
 
+# Tell Django it's behind an HTTPS proxy (Replit serves HTTPS externally)
+# This is required for secure cookies to work properly
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Application definition
 
