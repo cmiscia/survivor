@@ -112,6 +112,16 @@ WSGI_APPLICATION = 'survivor.wsgi.application'
 import os
 
 # PostgreSQL Database Configuration
+# Validate required PostgreSQL environment variables in production
+required_pg_vars = ['PGDATABASE', 'PGUSER', 'PGPASSWORD', 'PGHOST', 'PGPORT']
+if not DEBUG:
+    missing_vars = [var for var in required_pg_vars if not os.environ.get(var)]
+    if missing_vars:
+        raise ValueError(
+            f'Missing required PostgreSQL environment variables in production: {", ".join(missing_vars)}. '
+            'These must be set in deployment secrets for the database connection to work.'
+        )
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
