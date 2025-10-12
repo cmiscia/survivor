@@ -9,6 +9,12 @@ This is a Django-based NFL Survivor Pool web application where users can make we
 - **Current State:** Application is running with NFL API integration and PostgreSQL backend
 
 ## Recent Changes
+- October 12, 2025: Fixed production deployment configuration
+  - Added CSRF_TRUSTED_ORIGINS for all Replit deployment domains (.replit.app, .replit.dev, .repl.co)
+  - Added PostgreSQL environment variable validation in production (prevents runtime errors)
+  - Configured build step to run Django migrations before deployment startup
+  - Enhanced error messages for missing environment variables in production
+
 - October 12, 2025: Added tie game handling logic
   - Ties now count as losses for survivor pool rules
   - Updated ESPN API parsing to detect tie games (equal scores)
