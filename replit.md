@@ -9,22 +9,6 @@ This is a Django-based NFL Survivor Pool web application where users can make we
 - **Current State:** Application is running with NFL API integration and PostgreSQL backend
 
 ## Recent Changes
-- October 13, 2025: Fixed deployment health check timeouts with comprehensive optimizations
-  - Modified HomeView to handle HEAD requests (used by health checks) without database queries
-  - HEAD requests return 200 OK instantly, GET requests show normal home page
-  - Added database connection pooling (CONN_MAX_AGE=60) to reuse connections
-  - Configured database connection timeout (10 seconds) to prevent hanging
-  - Added comprehensive logging for debugging health checks in production
-  - Added error handling in HomeView.get_queryset() to prevent crashes
-  - Configured Gunicorn with 2 workers and 120s timeout for better performance
-  - Replit health checks always ping root `/` endpoint (no custom path support)
-
-- October 12, 2025: Fixed static files serving in production with WhiteNoise
-  - Installed WhiteNoise package for serving static files through Gunicorn
-  - Configured WhiteNoise middleware and CompressedManifestStaticFilesStorage
-  - Added STATIC_ROOT configuration and collectstatic to deployment build step
-  - Static CSS/JS files now properly served in production deployments
-
 - October 12, 2025: Fixed production deployment configuration
   - Added CSRF_TRUSTED_ORIGINS for all Replit deployment domains (.replit.app, .replit.dev, .repl.co)
   - Added PostgreSQL environment variable validation in production (prevents runtime errors)
