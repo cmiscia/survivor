@@ -1,5 +1,5 @@
 from typing import Any, Dict
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django_tables2 import SingleTableView
@@ -10,6 +10,10 @@ from .tables import PickTable
 import pandas as pd
 import datetime
 from django.contrib.auth.models import User
+
+def health_check(request):
+    """Lightweight health check endpoint for deployment health checks"""
+    return HttpResponse("OK", status=200)
 
 LEADERBOARD_COLUMNS = [
     'User Name',
