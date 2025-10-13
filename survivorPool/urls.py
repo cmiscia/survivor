@@ -1,11 +1,10 @@
 from django.urls import path
 #from . import views
-from .views import health_check, HomeView, AddPickView, PickDetailView, UpdatePickView, DeletePickView, PickView, modelToDataFrame, allPicksView
+from .views import HomeView, AddPickView, PickDetailView, UpdatePickView, DeletePickView, PickView, modelToDataFrame, allPicksView
 
 urlpatterns = [
     #path("", views.index, name="index"),
-    path('', health_check, name="health_check"),
-    path('home/', HomeView.as_view(), name="home"),
+    path('', HomeView.as_view(), name="home"),
     path('add_pick/', AddPickView.as_view(), name="add_pick"),
     path('pick_details/<int:pk>', PickDetailView.as_view(), name="pick_details"),
     path('pick/edit/<int:pk>', UpdatePickView.as_view(), name="edit_pick"),

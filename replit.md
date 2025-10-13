@@ -10,9 +10,9 @@ This is a Django-based NFL Survivor Pool web application where users can make we
 
 ## Recent Changes
 - October 13, 2025: Fixed deployment health check timeouts
-  - Created lightweight health_check view at / that returns 200 without database queries
-  - Moved HomeView to /home/ to avoid expensive DB operations during health checks
-  - Updated LOGIN_REDIRECT_URL and LOGOUT_REDIRECT_URL to /home/
+  - Modified HomeView to handle HEAD requests (used by health checks) without database queries
+  - HEAD requests return 200 OK instantly, GET requests show normal home page
+  - Replit health checks always ping root `/` endpoint (no custom path support)
   - Configured Gunicorn with 2 workers and 120s timeout for better performance
   - Health checks now pass quickly, enabling successful production deployments
 

@@ -11,10 +11,6 @@ import pandas as pd
 import datetime
 from django.contrib.auth.models import User
 
-def health_check(request):
-    """Lightweight health check endpoint - redirects to home for users"""
-    return redirect('/home/')
-
 LEADERBOARD_COLUMNS = [
     'User Name',
     'Team',
@@ -31,6 +27,10 @@ class HomeView(ListView):
     model = Pick
     template_name = 'home.html'
     ordering = ['week']
+    
+    def head(self, *args, **kwargs):
+        """Lightweight health check response for HEAD requests"""
+        return HttpResponse(status=200)
 
 class AddPickView(CreateView):
     model = Pick
