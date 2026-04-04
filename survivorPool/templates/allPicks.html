@@ -12,7 +12,6 @@
         <span class="picks-badge loss">LOSS</span>
         <span class="picks-badge tbd">TBD</span>
         <span class="picks-badge empty">No Pick</span>
-        <span class="picks-eliminated-key">⚡ = Eliminated</span>
     </div>
 </div>
 
@@ -23,10 +22,7 @@
             <tr>
                 <th class="picks-week-col picks-sticky">WK</th>
                 {% for player in players %}
-                <th class="picks-player-col {% if player in eliminated %}eliminated-header{% endif %}">
-                    {% if player in eliminated %}<span class="elim-icon">⚡</span>{% endif %}
-                    {{ player }}
-                </th>
+                <th class="picks-player-col">{{ player }}</th>
                 {% endfor %}
             </tr>
         </thead>
