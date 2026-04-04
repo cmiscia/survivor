@@ -40,11 +40,12 @@
             <div class="matchup-teams">
 
                 {% if matchup.away %}
-                <label class="team-card {% if matchup.away_picked %}already-picked{% endif %}"
+                <label class="team-card {% if matchup.away_picked %}already-picked{% endif %}{% if selected_team_id == matchup.away.id %} selected{% endif %}"
                        for="team_{{ matchup.away.id }}">
                     <input type="radio" name="team" id="team_{{ matchup.away.id }}"
                            value="{{ matchup.away.id }}"
                            class="team-radio"
+                           {% if selected_team_id == matchup.away.id %}checked{% endif %}
                            {% if matchup.away_picked %}disabled{% endif %}>
                     <div class="team-logo-wrap">
                         {% if matchup.away_logo %}
@@ -64,11 +65,12 @@
 
                 <div class="vs-divider">@</div>
 
-                <label class="team-card {% if matchup.home_picked %}already-picked{% endif %}"
+                <label class="team-card {% if matchup.home_picked %}already-picked{% endif %}{% if selected_team_id == matchup.home.id %} selected{% endif %}"
                        for="team_{{ matchup.home.id }}">
                     <input type="radio" name="team" id="team_{{ matchup.home.id }}"
                            value="{{ matchup.home.id }}"
                            class="team-radio"
+                           {% if selected_team_id == matchup.home.id %}checked{% endif %}
                            {% if matchup.home_picked %}disabled{% endif %}>
                     <div class="team-logo-wrap">
                         {% if matchup.home_logo %}
@@ -264,6 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('selected-label').textContent = 'Selected: ' + teamName;
         });
     });
+
+    var preChecked = document.querySelector('.team-radio:checked');
+    if (preChecked) {
+        document.getElementById('submit-btn').disabled = false;
+        var teamName = preChecked.closest('.team-card').querySelector('.team-name').textContent.trim();
+        document.getElementById('selected-label').textContent = 'Selected: ' + teamName;
+    }
 
     var weekSelect = document.getElementById('{{ form.week.id_for_label }}');
     if (weekSelect) {

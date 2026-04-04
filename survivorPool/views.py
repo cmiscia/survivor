@@ -127,9 +127,29 @@ class AddPickView(CreateView):
                 if away:
                     paired_ids.add(away.id)
 
+        for team in week_teams:
+            if team.id not in paired_ids:
+                matchups.append({
+                    'home': team,
+                    'home_logo': logo_url(team),
+                    'home_picked': team.id in used_team_ids,
+                    'away': None,
+                    'away_logo': "",
+                    'away_picked': False,
+                    'game_time': team.game_time,
+                })
+
+        selected_team_id = None
+        if self.request.method == 'POST':
+            try:
+                selected_team_id = int(self.request.POST.get('team', ''))
+            except (ValueError, TypeError):
+                pass
+
         context['matchups'] = matchups
         context['used_team_ids'] = used_team_ids
         context['display_week'] = display_week
+        context['selected_team_id'] = selected_team_id
         return context
 
 
