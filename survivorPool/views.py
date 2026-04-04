@@ -64,6 +64,27 @@ class AddPickView(CreateView):
     form_class = PostForm
     template_name = 'add_pick.html'
 
+    def _get_current_nfl_week(self):
+        season_start_date = datetime.date(2025, 9, 5)
+        today = datetime.date.today()
+        if today < season_start_date:
+            return 1
+        delta = today - season_start_date
+        return min(delta.days // 7 + 1, 18)
+
+    def _get_display_week(self):
+        week_param = self.request.GET.get('week')
+        if week_param and week_param.isdigit():
+            week = int(week_param)
+            if 1 <= week <= 18:
+                return week
+        return self._get_current_nfl_week()
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['week'] = self._get_display_week()
+        return initial
+
     def get_form_kwargs(self):
         kwargs = super(AddPickView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
@@ -72,13 +93,7 @@ class AddPickView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        season_start_date = datetime.date(2025, 9, 5)
-        today = datetime.date.today()
-        if today < season_start_date:
-            current_week = 1
-        else:
-            delta = today - season_start_date
-            current_week = min(delta.days // 7 + 1, 18)
+        display_week = self._get_display_week()
 
         used_team_ids = set()
         if self.request.user.is_authenticated:
@@ -86,7 +101,7 @@ class AddPickView(CreateView):
                 Pick.objects.filter(user_name=self.request.user).values_list('team_id', flat=True)
             )
 
-        week_teams = list(Team.objects.filter(current_week=current_week))
+        week_teams = list(Team.objects.filter(current_week=display_week))
 
         def logo_url(team):
             abbrev = NFL_TEAM_LOGOS.get(team.team_name)
@@ -114,7 +129,7 @@ class AddPickView(CreateView):
 
         context['matchups'] = matchups
         context['used_team_ids'] = used_team_ids
-        context['current_week'] = current_week
+        context['display_week'] = display_week
         return context
 
 

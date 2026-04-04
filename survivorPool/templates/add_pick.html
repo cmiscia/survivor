@@ -3,20 +3,32 @@
 {% block content %}
 
 {% if user.is_authenticated %}
-<h1 class="mb-1">Week {{ current_week }} Matchups</h1>
-<p class="text-muted mb-3">Click a team to select your pick</p>
+<h1 class="mb-2">Make Your Pick</h1>
 
 <form method="POST" id="pick-form">
     {% csrf_token %}
+
     <input type="hidden" name="user_name" id="user" value="{{ user.id }}">
-    <input type="hidden" name="week" id="week-input" value="{{ current_week }}">
-    <input type="hidden" name="team" id="team-input" value="">
+
+    <div class="week-selector mb-3">
+        <label for="{{ form.week.id_for_label }}" class="form-label fw-semibold">Week</label>
+        {{ form.week }}
+        {% if form.week.errors %}
+        <div class="text-danger small mt-1">{{ form.week.errors }}</div>
+        {% endif %}
+    </div>
 
     {% if form.non_field_errors %}
     <div class="alert alert-danger">
         {% for error in form.non_field_errors %}{{ error }}{% endfor %}
     </div>
     {% endif %}
+
+    {% if form.team.errors %}
+    <div class="alert alert-danger">{{ form.team.errors }}</div>
+    {% endif %}
+
+    <p class="text-muted mb-3">Week {{ display_week }} matchups — click a team to select your pick</p>
 
     {% if matchups %}
     <div class="matchups-grid">
@@ -28,9 +40,12 @@
             <div class="matchup-teams">
 
                 {% if matchup.away %}
-                <div class="team-card {% if matchup.away_picked %}already-picked{% endif %}"
-                     data-team-id="{{ matchup.away.id }}"
-                     {% if not matchup.away_picked %}onclick="selectTeam({{ matchup.away.id }}, this)"{% endif %}>
+                <label class="team-card {% if matchup.away_picked %}already-picked{% endif %}"
+                       for="team_{{ matchup.away.id }}">
+                    <input type="radio" name="team" id="team_{{ matchup.away.id }}"
+                           value="{{ matchup.away.id }}"
+                           class="team-radio"
+                           {% if matchup.away_picked %}disabled{% endif %}>
                     <div class="team-logo-wrap">
                         {% if matchup.away_logo %}
                         <img src="{{ matchup.away_logo }}" onerror="this.style.display='none'"
@@ -44,14 +59,17 @@
                         {% if matchup.away.moneyline %}<span class="odds-info">{% if matchup.away.moneyline > 0 %}+{% endif %}{{ matchup.away.moneyline }}</span>{% endif %}
                     </div>
                     {% if matchup.away_picked %}<div class="already-picked-label">Already Picked</div>{% endif %}
-                </div>
+                </label>
                 {% endif %}
 
                 <div class="vs-divider">@</div>
 
-                <div class="team-card {% if matchup.home_picked %}already-picked{% endif %}"
-                     data-team-id="{{ matchup.home.id }}"
-                     {% if not matchup.home_picked %}onclick="selectTeam({{ matchup.home.id }}, this)"{% endif %}>
+                <label class="team-card {% if matchup.home_picked %}already-picked{% endif %}"
+                       for="team_{{ matchup.home.id }}">
+                    <input type="radio" name="team" id="team_{{ matchup.home.id }}"
+                           value="{{ matchup.home.id }}"
+                           class="team-radio"
+                           {% if matchup.home_picked %}disabled{% endif %}>
                     <div class="team-logo-wrap">
                         {% if matchup.home_logo %}
                         <img src="{{ matchup.home_logo }}" onerror="this.style.display='none'"
@@ -65,14 +83,14 @@
                         {% if matchup.home.moneyline %}<span class="odds-info">{% if matchup.home.moneyline > 0 %}+{% endif %}{{ matchup.home.moneyline }}</span>{% endif %}
                     </div>
                     {% if matchup.home_picked %}<div class="already-picked-label">Already Picked</div>{% endif %}
-                </div>
+                </label>
 
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <div class="alert alert-info">No matchups found for Week {{ current_week }}. Check back when the schedule is loaded.</div>
+    <div class="alert alert-info">No matchups found for Week {{ display_week }}. Check back when the schedule is loaded.</div>
     {% endif %}
 
     <div class="submit-row mt-4">
@@ -83,6 +101,10 @@
 </form>
 
 <style>
+.week-selector {
+    max-width: 200px;
+}
+
 .matchups-grid {
     display: flex;
     flex-direction: column;
@@ -125,12 +147,25 @@
     transition: border-color 0.15s, background 0.15s, transform 0.1s;
     position: relative;
     background: #f8f9fa;
+    display: block;
+}
+
+.team-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .team-card:not(.already-picked):hover {
     border-color: #0d6efd;
     background: #e8f0fe;
     transform: translateY(-2px);
+}
+
+.team-radio:checked + .team-logo-wrap,
+.team-card:has(.team-radio:checked) {
+    /* checked state is handled by JS class */
 }
 
 .team-card.selected {
@@ -215,16 +250,30 @@
 </style>
 
 <script>
-function selectTeam(teamId, el) {
-    document.querySelectorAll('.team-card.selected').forEach(function(c) {
-        c.classList.remove('selected');
+document.addEventListener('DOMContentLoaded', function() {
+    var radios = document.querySelectorAll('.team-radio');
+    radios.forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.team-card.selected').forEach(function(c) {
+                c.classList.remove('selected');
+            });
+            var card = radio.closest('.team-card');
+            card.classList.add('selected');
+            document.getElementById('submit-btn').disabled = false;
+            var teamName = card.querySelector('.team-name').textContent.trim();
+            document.getElementById('selected-label').textContent = 'Selected: ' + teamName;
+        });
     });
-    el.classList.add('selected');
-    document.getElementById('team-input').value = teamId;
-    document.getElementById('submit-btn').disabled = false;
-    var teamName = el.querySelector('.team-name').textContent.trim();
-    document.getElementById('selected-label').textContent = 'Selected: ' + teamName;
-}
+
+    var weekSelect = document.getElementById('{{ form.week.id_for_label }}');
+    if (weekSelect) {
+        weekSelect.addEventListener('change', function() {
+            var url = new URL(window.location.href);
+            url.searchParams.set('week', this.value);
+            window.location.href = url.toString();
+        });
+    }
+});
 </script>
 
 {% else %}
