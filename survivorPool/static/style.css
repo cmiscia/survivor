@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --navy:       #0d1b2a;
     --navy-mid:   #152238;
     --navy-light: #1e3350;
@@ -16,7 +16,7 @@
     --tbd:        #d97706;
 }
 
-/* ── Base ─────────────────────────────────────────── */
+/* -- Base ------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
@@ -26,12 +26,80 @@ body {
         radial-gradient(ellipse at 80% 90%, rgba(29,78,216,0.08) 0%, transparent 60%);
     background-attachment: scroll;
     color: var(--white);
-    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh;
     margin: 0;
 }
 
-/* ── Navbar ───────────────────────────────────────── */
+/* -- Local layout utilities -------------------------- */
+.container-fluid {
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+
+.row > * {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    width: 100%;
+}
+
+.justify-content-center { justify-content: center; }
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted) !important; }
+.text-danger { color: var(--loss) !important; }
+.fw-bold { font-weight: 700; }
+.fw-semibold { font-weight: 600; }
+.small { font-size: 0.82rem; }
+.display-6 { font-size: 2rem; }
+.d-inline { display: inline; }
+.d-md-none { display: block; }
+.w-100 { width: 100%; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.me-2 { margin-right: 0.5rem; }
+.me-3 { margin-right: 1rem; }
+.ms-2 { margin-left: 0.5rem; }
+.py-5 { padding-top: 3rem; padding-bottom: 3rem; }
+.h5 { font-size: 1.25rem; }
+
+.input-group {
+    display: flex;
+    width: 100%;
+}
+
+.input-group .form-control {
+    flex: 1 1 auto;
+}
+
+.input-group .btn {
+    flex: 0 0 auto;
+}
+
+.btn {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .col-md-5 { flex: 0 0 auto; width: 41.666%; }
+    .col-md-6 { flex: 0 0 auto; width: 50%; }
+}
+
+/* -- Navbar ----------------------------------------- */
 .navbar {
     background: var(--navy) !important;
     border-bottom: 3px solid var(--blue) !important;
@@ -39,23 +107,26 @@ body {
     padding: 0 1.25rem;
 }
 
+.navbar .container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .navbar-brand {
     color: var(--white) !important;
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     font-weight: 700;
     font-size: 1.5rem;
     letter-spacing: 2px;
     text-transform: uppercase;
 }
 
-.navbar-brand::before {
-    content: "🏈 ";
-    font-size: 1.2rem;
-}
-
 .nav-link {
+    display: block;
     color: rgba(255,255,255,0.8) !important;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Segoe UI', system-ui, sans-serif;
     font-weight: 600;
     font-size: 0.85rem;
     text-transform: uppercase;
@@ -65,13 +136,65 @@ body {
     border-bottom: 3px solid transparent;
 }
 
+.navbar-nav {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    display: block;
+    list-style: none;
+}
+
+.navbar-collapse {
+    flex-basis: 100%;
+    flex-grow: 1;
+}
+
+.collapse:not(.show) {
+    display: none;
+}
+
+.navbar-toggler {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0.4rem 0.65rem;
+}
+
+.navbar-toggler-icon {
+    display: block;
+    height: 2px;
+    width: 22px;
+    background: var(--white);
+    box-shadow: 0 6px 0 var(--white), 0 12px 0 var(--white);
+    margin-bottom: 12px;
+}
+
+@media (min-width: 992px) {
+    .navbar-toggler { display: none; }
+    .navbar-collapse {
+        display: flex !important;
+        flex-basis: auto;
+    }
+    .navbar-nav {
+        flex-direction: row;
+        align-items: center;
+    }
+    .me-auto { margin-right: auto; }
+}
+
 .nav-link:hover,
 .nav-link.active {
     color: var(--white) !important;
     border-bottom-color: var(--blue);
 }
 
-/* ── Main Container ───────────────────────────────── */
+/* -- Main Container --------------------------------- */
 .container {
     background: var(--surface);
     color: var(--text-dark);
@@ -83,7 +206,7 @@ body {
     border-top: 4px solid var(--blue);
 }
 
-/* ── Headings ─────────────────────────────────────── */
+/* -- Headings --------------------------------------- */
 h1, h2, h3 {
     font-family: 'Oswald', sans-serif;
     font-weight: 700;
@@ -103,7 +226,7 @@ h1 {
 h2 { font-size: 1.5rem; }
 h3 { font-size: 1.2rem; }
 
-/* ── Buttons ──────────────────────────────────────── */
+/* -- Buttons ---------------------------------------- */
 .btn-primary {
     background: var(--blue);
     border: none;
@@ -149,7 +272,7 @@ h3 { font-size: 1.2rem; }
     color: var(--text-dark);
 }
 
-/* ── Links ────────────────────────────────────────── */
+/* -- Links ------------------------------------------ */
 a {
     color: var(--blue);
     text-decoration: none;
@@ -159,7 +282,7 @@ a {
 
 a:hover { color: var(--blue-hover); }
 
-/* ── Tables ───────────────────────────────────────── */
+/* -- Tables ----------------------------------------- */
 .table {
     background-color: var(--white);
     color: var(--text-dark);
@@ -198,7 +321,7 @@ a:hover { color: var(--blue-hover); }
     background-color: #e8f0fe;
 }
 
-/* ── Scrollable Table Container ───────────────────── */
+/* -- Scrollable Table Container --------------------- */
 .table-responsive-wrapper {
     overflow-x: auto;
     width: 100%;
@@ -212,7 +335,7 @@ a:hover { color: var(--blue-hover); }
 .table-responsive-wrapper::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
 .table-responsive-wrapper::-webkit-scrollbar-thumb:hover { background: var(--blue); }
 
-/* ── Forms ────────────────────────────────────────── */
+/* -- Forms ------------------------------------------ */
 .form-control,
 .form-select {
     border: 2px solid var(--border);
@@ -239,7 +362,7 @@ a:hover { color: var(--blue-hover); }
     letter-spacing: 0.06em;
 }
 
-/* ── Badges ───────────────────────────────────────── */
+/* -- Badges ----------------------------------------- */
 .badge {
     font-family: 'Oswald', sans-serif;
     font-weight: 600;
@@ -248,7 +371,7 @@ a:hover { color: var(--blue-hover); }
     border-radius: 3px;
 }
 
-/* ── Alerts ───────────────────────────────────────── */
+/* -- Alerts ----------------------------------------- */
 .alert {
     border-radius: 3px;
     border-left: 4px solid;
@@ -259,13 +382,13 @@ a:hover { color: var(--blue-hover); }
 .alert-info    { border-left-color: var(--blue); }
 .alert-success { border-left-color: var(--win); }
 
-/* ── Pick items (home page) ───────────────────────── */
+/* -- Pick items (home page) ------------------------- */
 .pick-item {
     border-radius: 4px;
     border: 1px solid var(--border);
 }
 
-/* ── Matchup card styles (add_pick page) ──────────── */
+/* -- Matchup card styles (add_pick page) ------------ */
 .matchups-grid { display: flex; flex-direction: column; gap: 14px; }
 
 .matchup-card {
@@ -408,7 +531,7 @@ a:hover { color: var(--blue-hover); }
     text-align: center;
 }
 
-/* ── All Picks Grid ───────────────────────────────── */
+/* -- All Picks Grid --------------------------------- */
 .picks-header { margin-bottom: 1.25rem; }
 
 .picks-legend {
@@ -588,7 +711,7 @@ a:hover { color: var(--blue-hover); }
     color: var(--text-muted);
 }
 
-/* ── Navbar logout ─────────────────────────────────── */
+/* -- Navbar logout ----------------------------------- */
 .btn-nav-logout {
     background: none;
     border: none;
@@ -601,7 +724,7 @@ a:hover { color: var(--blue-hover); }
     letter-spacing: 0.08em;
 }
 
-/* ── Home pick rows (mobile) ─────────────────────── */
+/* -- Home pick rows (mobile) ----------------------- */
 .pick-item-row {
     display: flex;
     flex-wrap: wrap;
@@ -620,7 +743,7 @@ a:hover { color: var(--blue-hover); }
 .badge-win { background: var(--win); color: #fff; }
 .badge-loss { background: var(--loss); color: #fff; }
 
-/* ── Week summary cards (mobile allPicks) ────────── */
+/* -- Week summary cards (mobile allPicks) ---------- */
 .week-summary-cards {
     display: flex;
     flex-direction: column;
@@ -654,7 +777,7 @@ a:hover { color: var(--blue-hover); }
     grid-row: 1 / span 2;
 }
 
-/* ── League chat ───────────────────────────────────── */
+/* -- League chat ------------------------------------- */
 .chat-messages {
     max-height: 60vh;
     overflow-y: auto;

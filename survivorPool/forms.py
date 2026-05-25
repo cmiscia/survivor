@@ -1,4 +1,4 @@
-from django import forms
+﻿from django import forms
 from django.conf import settings
 from .models import Game, Pick, Team
 from .utils import is_week_locked
@@ -86,7 +86,7 @@ class PostForm(forms.ModelForm):
         # Team name with favorite indicator
         team_name = str(team.team_name)
         if team.is_favorite:
-            team_name = f"⭐ {team_name}"
+            team_name = f"FAV {team_name}"
         
         # Add opponent
         location = "vs" if team.is_home else "@"
