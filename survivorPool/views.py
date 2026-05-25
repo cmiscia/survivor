@@ -320,7 +320,21 @@ def all_picks_view(request):
     else:
         current_nfl_week = get_current_nfl_week(season_start_date)
 
-    grid = build_picks_grid(max_week=current_nfl_week)
+    grid = build_picks_grid()
+    leaderboard_rows = build_leaderboard_rows()
+    leaderboard_lookup = {row['username']: row for row in leaderboard_rows}
+    grid_summary = []
+    for player in grid['players']:
+        row = leaderboard_lookup.get(player, {})
+        losses = row.get('loss_count', 0)
+        pot = row.get('pot_contribution', 50)
+        grid_summary.append({
+            'player': player,
+            'losses': losses,
+            'owed': max(pot - 50, 0),
+            'pot': pot,
+        })
+
     current_week_cards = []
     if grid['players'] and current_nfl_week:
         for player in grid['players']:
@@ -335,6 +349,7 @@ def all_picks_view(request):
     return render(request, 'allPicks.html', {
         'players': grid['players'],
         'rows': grid['rows'],
+        'grid_summary': grid_summary,
         'current_nfl_week': current_nfl_week,
         'current_week_cards': current_week_cards,
         'season_year': settings.NFL_SEASON_YEAR,

@@ -4,8 +4,9 @@
 {% if user.is_authenticated %}
 
 <div class="picks-header">
+    <p class="eyebrow">League Board</p>
     <h1 class="mb-1">{{ season_year }} League Picks</h1>
-    <p class="text-muted mb-3 picks-subtitle">Scroll the grid sideways on mobile, or use This Week below</p>
+    <p class="text-muted mb-3 picks-subtitle">Scan this week's board, then scroll the full pick history below.</p>
 
     <div class="picks-legend">
         <span class="picks-badge win">WIN</span>
@@ -16,7 +17,7 @@
 </div>
 
 {% if current_week_cards %}
-<div class="week-summary-mobile d-md-none mb-4">
+<div class="week-summary-panel mb-4">
     <h2 class="h5 mb-2">Week {{ current_nfl_week }}</h2>
     <div class="week-summary-cards">
         {% for card in current_week_cards %}
@@ -33,6 +34,7 @@
 {% endif %}
 
 {% if rows %}
+<h2 class="h5 mb-2">Full Pick Grid</h2>
 <div class="picks-scroll-wrapper">
     <table class="picks-table">
         <thead>
@@ -63,6 +65,26 @@
             </tr>
             {% endfor %}
         </tbody>
+        <tfoot>
+            <tr>
+                <td class="picks-summary-label picks-sticky">Losses</td>
+                {% for summary in grid_summary %}
+                <td class="picks-summary-cell">{{ summary.losses }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td class="picks-summary-label picks-sticky">Owed</td>
+                {% for summary in grid_summary %}
+                <td class="picks-summary-cell">${{ summary.owed }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td class="picks-summary-label picks-sticky">Total Pot</td>
+                {% for summary in grid_summary %}
+                <td class="picks-summary-cell">${{ summary.pot }}</td>
+                {% endfor %}
+            </tr>
+        </tfoot>
     </table>
 </div>
 {% else %}

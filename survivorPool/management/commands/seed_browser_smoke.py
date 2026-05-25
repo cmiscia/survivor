@@ -13,12 +13,29 @@ class Command(BaseCommand):
     help = "Seed deterministic local data for Playwright browser smoke tests."
 
     def handle(self, *args, **options):
+        demo_usernames = [
+            'browser_user',
+            'rival_player',
+            'admin_user',
+            'alex_b',
+            'casey_q',
+            'drew_m',
+            'jamie_r',
+            'jordan_p',
+            'morgan_l',
+            'quinn_s',
+            'sam_t',
+            'taylor_w',
+            'avery_k',
+            'riley_c',
+        ]
+
         WeekLockRun.objects.all().delete()
         ChatMessage.objects.all().delete()
         Pick.objects.all().delete()
         Game.objects.all().delete()
         Team.objects.all().delete()
-        User.objects.filter(username__in=['browser_user', 'rival_player', 'admin_user']).delete()
+        User.objects.filter(username__in=demo_usernames).delete()
 
         browser_user = User.objects.create_user(
             username='browser_user',
@@ -35,6 +52,21 @@ class Command(BaseCommand):
             password='Test4321!',
             email='admin@example.com',
         )
+        demo_users = [
+            browser_user,
+            rival,
+            User.objects.create_user(username='alex_b', password='Test4321!', email='alex@example.com'),
+            User.objects.create_user(username='casey_q', password='Test4321!', email='casey@example.com'),
+            User.objects.create_user(username='drew_m', password='Test4321!', email='drew@example.com'),
+            User.objects.create_user(username='jamie_r', password='Test4321!', email='jamie@example.com'),
+            User.objects.create_user(username='jordan_p', password='Test4321!', email='jordan@example.com'),
+            User.objects.create_user(username='morgan_l', password='Test4321!', email='morgan@example.com'),
+            User.objects.create_user(username='quinn_s', password='Test4321!', email='quinn@example.com'),
+            User.objects.create_user(username='sam_t', password='Test4321!', email='sam@example.com'),
+            User.objects.create_user(username='taylor_w', password='Test4321!', email='taylor@example.com'),
+            User.objects.create_user(username='avery_k', password='Test4321!', email='avery@example.com'),
+            User.objects.create_user(username='riley_c', password='Test4321!', email='riley@example.com'),
+        ]
 
         teams = {
             name: Team.objects.create(team_name=name)
@@ -47,6 +79,17 @@ class Command(BaseCommand):
                 'Raiders',
                 'Patriots',
                 'Jets',
+                'Ravens',
+                'Bengals',
+                'Cowboys',
+                'Eagles',
+                'Lions',
+                'Vikings',
+                '49ers',
+                'Seahawks',
+                'Texans',
+                'Colts',
+                'No Pick',
             ]
         }
 
@@ -66,11 +109,22 @@ class Command(BaseCommand):
         )
         games = [
             (1, 'Bills', 'Dolphins', 0, True),
-            (1, 'Packers', 'Bears', 3, False),
+            (1, 'Packers', 'Bears', 0, False),
+            (1, 'Ravens', 'Bengals', 1, True),
             (2, 'Chiefs', 'Raiders', 7, True),
             (2, 'Jets', 'Patriots', 7, False),
+            (2, 'Cowboys', 'Eagles', 8, False),
+            (3, 'Lions', 'Vikings', 14, True),
+            (3, '49ers', 'Seahawks', 14, True),
+            (4, 'Texans', 'Colts', 21, False),
+            (4, 'Bills', 'Patriots', 21, True),
+            (5, 'Eagles', 'Cowboys', 28, True),
+            (5, 'Bengals', 'Ravens', 28, False),
+            (6, 'Vikings', 'Lions', 35, False),
+            (6, 'Seahawks', '49ers', 35, False),
             (7, 'Patriots', 'Bills', 42, True),
             (7, 'Bears', 'Packers', 42, False),
+            (7, 'Chiefs', 'Jets', 43, True),
         ]
         for week, home, away, days_offset, home_favorite in games:
             Game.objects.create(
@@ -87,20 +141,62 @@ class Command(BaseCommand):
                 away_is_favorite=not home_favorite,
             )
 
-        Pick.objects.create(user_name=browser_user, team=teams['Bills'], week=7, is_win=None)
-        Pick.objects.create(user_name=browser_user, team=teams['Chiefs'], week=2, is_win=True)
-        Pick.objects.create(user_name=rival, team=teams['Dolphins'], week=1, is_win=False)
-        Pick.objects.create(user_name=rival, team=teams['Packers'], week=2, is_win=True)
+        pick_plan = {
+            'browser_user': [('Dolphins', False), ('Chiefs', True), ('Lions', True), ('Texans', False), ('Eagles', True), ('Vikings', True), ('Bills', None)],
+            'rival_player': [('Bills', True), ('Packers', True), ('49ers', False), ('Patriots', True), ('Ravens', False), ('Seahawks', True), ('Bears', None)],
+            'alex_b': [('Ravens', True), ('Cowboys', False), ('Vikings', True), ('Bills', True), ('Bengals', True), ('49ers', None)],
+            'casey_q': [('Packers', True), ('Jets', False), ('Lions', True), ('Colts', False), ('Cowboys', True), ('No Pick', False), ('Patriots', None)],
+            'drew_m': [('Bengals', False), ('Raiders', True), ('Seahawks', True), ('Texans', True), ('Eagles', False), ('Lions', None)],
+            'jamie_r': [('Bears', False), ('Chiefs', True), ('49ers', True), ('Patriots', False), ('Ravens', True), ('Vikings', None)],
+            'jordan_p': [('Bills', True), ('Eagles', True), ('Lions', False), ('Colts', True), ('Bengals', None)],
+            'morgan_l': [('Dolphins', False), ('Patriots', True), ('Vikings', True), ('Texans', True), ('Cowboys', False), ('49ers', None)],
+            'quinn_s': [('Ravens', True), ('Jets', False), ('Seahawks', False), ('Bills', True), ('Eagles', True), ('No Pick', False)],
+            'sam_t': [('Packers', True), ('Chiefs', True), ('Lions', True), ('Patriots', True), ('Bengals', False), ('Vikings', None)],
+            'taylor_w': [('Bears', False), ('Cowboys', False), ('49ers', True), ('Texans', True), ('Ravens', True)],
+            'avery_k': [('Bills', True), ('Raiders', False), ('Vikings', True), ('Colts', False), ('Eagles', None)],
+            'riley_c': [('Dolphins', False), ('Packers', True), ('Seahawks', True), ('Patriots', True), ('Cowboys', False), ('Lions', None)],
+        }
+        users_by_name = {user.username: user for user in demo_users}
+        for username, picks in pick_plan.items():
+            for week, (team_name, result) in enumerate(picks, start=1):
+                Pick.objects.create(
+                    user_name=users_by_name[username],
+                    team=teams[team_name],
+                    week=week,
+                    is_win=result,
+                    missed_deadline=team_name == 'No Pick',
+                )
 
-        for i in range(205):
+        chat_lines = [
+            ('alex_b', 'Bills looked way too obvious but I took them anyway.'),
+            ('casey_q', 'Putting this in writing so I cannot deny it later: Week 2 scares me.'),
+            ('browser_user', 'If the Packers lose I am blaming the group chat.'),
+            ('rival_player', 'Respectfully, this is already chaos.'),
+            ('jamie_r', 'Sunday reminder: do not wait until kickoff to remember this exists.'),
+            ('sam_t', 'My spreadsheet says Chiefs. My gut says pain.'),
+            ('morgan_l', 'Pot is getting spicy for September.'),
+            ('quinn_s', 'Can we get a shame corner trophy?'),
+            ('taylor_w', 'I have changed my pick four times and learned nothing.'),
+            ('avery_k', 'Week 7 board is nasty.'),
+            ('riley_c', 'No pick should absolutely count as a public roast.'),
+            ('drew_m', 'The bot posting everyone at lock is elite.'),
+        ]
+        for i in range(188):
+            author_name, body = chat_lines[i % len(chat_lines)]
             ChatMessage.objects.create(
-                author=browser_user if i % 2 == 0 else rival,
-                body=f'Browser smoke message {i}',
+                author=users_by_name[author_name],
+                body=body if i < len(chat_lines) else f'{body} #{i}',
             )
 
         ChatMessage.objects.create(
             author=None,
-            body='Week 7 locked. Shame corner: no missed picks.',
+            body='Week 5 locked. Shame corner: casey_q and quinn_s missed the deadline.',
+            message_type=ChatMessage.MESSAGE_WEEKLY_LOCK,
+            week=5,
+        )
+        ChatMessage.objects.create(
+            author=None,
+            body='Week 7 preview posted. Three players are still TBD and the pot is already moving.',
             message_type=ChatMessage.MESSAGE_WEEKLY_LOCK,
             week=7,
         )
