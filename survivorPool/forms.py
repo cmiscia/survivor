@@ -1,8 +1,7 @@
 from django import forms
 from django.conf import settings
 from .models import Game, Pick, Team
-from datetime import datetime, timedelta
-import pytz
+from .utils import is_week_locked
 
 CHOICES = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8),
            (9, 9), (10, 10), (11, 11), (12, 12), (13, 13), (14, 14), (15, 15),
@@ -128,12 +127,11 @@ class PostForm(forms.ModelForm):
                     f"You already picked {team.team_name} in Week {previous_pick.week}. You cannot pick the same team twice in a season."
                 )
 
-        # Check if week is locked (Sunday morning or later)
         if week:
             week_num = int(week)
-            if self.is_week_locked(week_num):
+            if is_week_locked(week_num):
                 raise forms.ValidationError(
-                    f"Week {week_num} is locked. Picks cannot be made or changed after Sunday morning EST."
+                    f"Week {week_num} is locked. Picks cannot be made or changed after 1:05 PM ET Sunday."
                 )
 
             if team and not self._team_available_for_week(team, week_num):
@@ -158,25 +156,6 @@ class PostForm(forms.ModelForm):
             return team.id in game_team_ids
 
         return team.current_week == week_number
-
-    def is_week_locked(self, week_number):
-        """Check if the given week is locked (past Sunday morning EST)"""
-        est = pytz.timezone('US/Eastern')
-        now = datetime.now(est)
-
-        # Calculate the Sunday of the given week
-        season_start = datetime.combine(settings.NFL_SEASON_START_DATE,
-                                        datetime.min.time())
-        season_start = est.localize(season_start)
-        days_to_week = (week_number - 1) * 7
-        # Sunday of the given week (Week 1 Sunday is Sept 7)
-        week_sunday = season_start + timedelta(days=days_to_week + 2)
-        week_sunday = week_sunday.replace(hour=9,
-                                          minute=0,
-                                          second=0,
-                                          microsecond=0)  # 9 AM EST Sunday
-
-        return now >= week_sunday
 
 
 class UpdatePickForm(forms.ModelForm):

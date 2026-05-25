@@ -2,36 +2,32 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-<h1>{{ season_year }} Leaderboard</h1>
-<p class="text-muted">Wins ranked · Pot contribution = $50 buy-in + $10 per loss (simplified)</p>
+<h1>{{ season_year }} Pot</h1>
+<p class="text-muted">Simplified tracking: $50 entry + $10 per recorded loss. Favorite-loss ($25) and half-loss credits coming in a future update.</p>
+
+<p class="display-6 fw-bold">Total pot: ${{ total_pot }}</p>
 
 <div class="table-responsive-wrapper">
-    <table class="table table-striped table-hover">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Player</th>
-                <th>Wins</th>
                 <th>Losses</th>
-                <th>Pot $</th>
+                <th>Contributed</th>
             </tr>
         </thead>
         <tbody>
             {% for row in leaderboard_rows %}
             <tr>
                 <td>{{ row.username }}</td>
-                <td>{{ row.win_count }}</td>
                 <td>{{ row.loss_count }}</td>
                 <td>${{ row.pot_contribution }}</td>
             </tr>
-            {% empty %}
-            <tr><td colspan="4">No players yet.</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
-<p class="fw-semibold mt-2">Total pot: ${{ total_pot }}</p>
-
 {% else %}
-<h1>Login to get started</h1>
+<h1>Login to view the pot</h1>
 {% endif %}
 {% endblock %}

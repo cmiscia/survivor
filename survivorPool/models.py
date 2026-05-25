@@ -53,14 +53,73 @@ class Pick(models.Model):
     publication_date = models.DateTimeField("date published", default=timezone.now)
     week = models.IntegerField()
     is_win = models.BooleanField(null=True, blank=True, default=None)
+    missed_deadline = models.BooleanField(
+        default=False,
+        help_text="Auto-assigned loss when no pick by Sunday 1:05 PM ET.",
+    )
 
     class Meta:
         unique_together = ('user_name', 'week')
 
     def __str__(self):
         return str(self.team) + ' | ' + str(self.user_name)
-    
+
     def get_absolute_url(self):
-        return reverse('home') 
-    
-    
+        return reverse('home')
+
+
+class ChatMessage(models.Model):
+    MESSAGE_USER = 'user'
+    MESSAGE_WEEKLY_LOCK = 'weekly_lock_summary'
+    MESSAGE_TYPES = [
+        (MESSAGE_USER, 'User'),
+        (MESSAGE_WEEKLY_LOCK, 'Weekly lock summary'),
+    ]
+
+    author = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='chat_messages',
+    )
+    body = models.TextField()
+    message_type = models.CharField(
+        max_length=32,
+        choices=MESSAGE_TYPES,
+        default=MESSAGE_USER,
+    )
+    week = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at', 'id']
+
+    def __str__(self):
+        if self.message_type == self.MESSAGE_WEEKLY_LOCK:
+            return f"Week {self.week} lock summary"
+        return f"{self.author}: {self.body[:40]}"
+
+
+class WeekLockRun(models.Model):
+    season_year = models.IntegerField()
+    week = models.IntegerField()
+    ran_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('season_year', 'week')
+
+    def __str__(self):
+        return f"{self.season_year} Week {self.week} locked at {self.ran_at}"
+
+
+class SeasonSettings(models.Model):
+    season_year = models.IntegerField(unique=True)
+    buy_in = models.DecimalField(max_digits=8, decimal_places=2, default=50)
+    loss_amount = models.DecimalField(max_digits=8, decimal_places=2, default=10)
+    favorite_loss_amount = models.DecimalField(max_digits=8, decimal_places=2, default=25)
+    underdog_half_threshold = models.DecimalField(max_digits=4, decimal_places=2, default=5)
+
+    def __str__(self):
+        return f"Season {self.season_year} settings"
+

@@ -131,7 +131,7 @@ if _db_url:
     DATABASES = {
         'default': dj_database_url.parse(_db_url, conn_max_age=600)
     }
-else:
+elif os.environ.get('PGHOST'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -142,14 +142,13 @@ else:
             'PORT': os.environ.get('PGPORT'),
         }
     }
-
-# Old SQLite Configuration (kept for reference)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 

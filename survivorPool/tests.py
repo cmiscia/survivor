@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AnonymousUser, User
+from django.core.management import call_command
 from django.test import RequestFactory, TestCase
 from unittest.mock import patch
 
 from .forms import PostForm
-from .models import Game, Pick, Team
+from .models import ChatMessage, Game, Pick, Team, WeekLockRun
+from .utils import build_picks_grid
 from .views import AddPickView
 
 
@@ -88,7 +90,7 @@ class PostFormTests(TestCase):
             user=user,
         )
 
-        with patch.object(PostForm, 'is_week_locked', return_value=False):
+        with patch('survivorPool.forms.is_week_locked', return_value=False):
             self.assertFalse(form.is_valid())
 
         self.assertIn('Select a valid choice', str(form.errors))
@@ -102,7 +104,7 @@ class AddPickSecurityTests(TestCase):
 
         self.client.login(username='miscia', password='password')
 
-        with patch.object(PostForm, 'is_week_locked', return_value=False):
+        with patch('survivorPool.forms.is_week_locked', return_value=False):
             response = self.client.post(
                 '/add_pick/',
                 {'team': team.id, 'week': 7, 'user_name': other_user.id},
@@ -111,3 +113,61 @@ class AddPickSecurityTests(TestCase):
         self.assertRedirects(response, '/', fetch_redirect_response=False)
         pick = Pick.objects.get()
         self.assertEqual(pick.user_name, user)
+
+
+class UtilsTests(TestCase):
+    def test_build_picks_grid_without_pandas(self):
+        user = User.objects.create_user(username='alice')
+        team = Team.objects.create(team_name='Bills')
+        Pick.objects.create(user_name=user, team=team, week=1, is_win=True)
+
+        grid = build_picks_grid(max_week=1)
+        self.assertEqual(grid['players'], ['alice'])
+        self.assertEqual(grid['pick_lookup'][(1, 'alice')]['team'], 'Bills')
+        self.assertEqual(grid['pick_lookup'][(1, 'alice')]['status'], 'WIN')
+
+    def test_leaderboard_excludes_admin_users(self):
+        User.objects.create_superuser(username='admin', password='password')
+        player = User.objects.create_user(username='player')
+        team = Team.objects.create(team_name='Bills')
+        Pick.objects.create(user_name=player, team=team, week=1, is_win=True)
+
+        from .utils import build_leaderboard_rows
+        rows = build_leaderboard_rows()
+
+        self.assertEqual([row['username'] for row in rows], ['player'])
+
+
+class LockWeekCommandTests(TestCase):
+    def test_lock_week_posts_chat_and_auto_loss(self):
+        user = User.objects.create_user(username='late')
+        User.objects.create_superuser(username='admin', password='password')
+        Team.objects.create(team_name='Bills')
+
+        with patch('survivorPool.management.commands.lock_week_and_post_chat.is_week_locked', return_value=True):
+            call_command('lock_week_and_post_chat', '--week=3', '--force')
+
+        pick = Pick.objects.get(user_name=user, week=3)
+        self.assertFalse(pick.is_win)
+        self.assertTrue(pick.missed_deadline)
+        self.assertFalse(Pick.objects.filter(user_name__username='admin', week=3).exists())
+        self.assertTrue(WeekLockRun.objects.filter(week=3).exists())
+        msg = ChatMessage.objects.get(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK)
+        self.assertIn('Week 3', msg.body)
+        self.assertIn('late', msg.body)
+        self.assertIn('Shame corner', msg.body)
+
+
+class ChatViewTests(TestCase):
+    def test_chat_poll_without_after_is_capped(self):
+        user = User.objects.create_user(username='chatter', password='password')
+        for i in range(205):
+            ChatMessage.objects.create(author=user, body=f'message {i}')
+
+        self.client.login(username='chatter', password='password')
+        response = self.client.get('/chat/poll/')
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(len(payload['messages']), 200)
+        self.assertEqual(payload['messages'][0]['body'], 'message 5')

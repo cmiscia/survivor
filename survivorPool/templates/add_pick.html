@@ -28,7 +28,10 @@
     <div class="alert alert-danger">{{ form.team.errors }}</div>
     {% endif %}
 
-    <p class="text-muted mb-3">Week {{ display_week }} matchups — click a team to select your pick</p>
+    {% if week_locked %}
+    <div class="alert alert-warning">Week {{ display_week }} is locked (past Sunday 1:05 PM ET).</div>
+    {% endif %}
+    <p class="text-muted mb-3">Week {{ display_week }} matchups — tap a team to select your pick</p>
 
     {% if matchups %}
     <div class="matchups-grid">
@@ -49,7 +52,8 @@
                            {% if matchup.away_picked %}disabled{% endif %}>
                     <div class="team-logo-wrap">
                         {% if matchup.away_logo %}
-                        <img src="{{ matchup.away_logo }}" onerror="this.style.display='none'"
+                        <img src="{{ matchup.away_logo }}" loading="lazy" decoding="async"
+                             onerror="this.style.display='none'"
                              alt="{{ matchup.away.team_name }}" class="team-logo">
                         {% endif %}
                     </div>
@@ -74,7 +78,8 @@
                            {% if matchup.home_picked %}disabled{% endif %}>
                     <div class="team-logo-wrap">
                         {% if matchup.home_logo %}
-                        <img src="{{ matchup.home_logo }}" onerror="this.style.display='none'"
+                        <img src="{{ matchup.home_logo }}" loading="lazy" decoding="async"
+                             onerror="this.style.display='none'"
                              alt="{{ matchup.home.team_name }}" class="team-logo">
                         {% endif %}
                     </div>
