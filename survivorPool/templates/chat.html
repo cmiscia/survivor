@@ -2,6 +2,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
+<div class="chat-page-shell">
 <div class="chat-header">
     <div>
         <p class="eyebrow">Live Room</p>
@@ -11,7 +12,7 @@
     <span class="chat-status">Text only</span>
 </div>
 
-<div id="chat-messages" class="chat-messages">
+<div id="chat-messages" class="chat-messages chat-messages--page">
     {% for msg in messages %}
     <div class="chat-message {% if msg.message_type == 'weekly_lock_summary' %}chat-message--system{% elif msg.author == user %}chat-message--mine{% endif %}" data-id="{{ msg.id }}">
         <div class="chat-message-header">
@@ -33,6 +34,7 @@
         <button type="submit" class="btn btn-primary">Send</button>
     </div>
 </form>
+</div>
 
 {% else %}
 <h1>Login to join league chat</h1>

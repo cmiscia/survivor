@@ -106,8 +106,13 @@ test('authenticated navigation pages render cleanly', async ({ page }, testInfo)
     await expectNoBrokenText(page);
   }
 
-  await expect(page.locator('.chat-message')).toHaveCount(190);
-  await expect(page.locator('.chat-message--system')).toHaveCount(2);
+  await expect(page.locator('#chat-messages .chat-message')).toHaveCount(190);
+  await expect(page.locator('#chat-messages .chat-message--system')).toHaveCount(2);
+  await page.goto('/');
+  await expect(page.locator('#chat-widget')).not.toHaveClass(/is-open/);
+  await page.getByRole('button', { name: 'Chat', exact: true }).click();
+  await expect(page.locator('#chat-widget')).toHaveClass(/is-open/);
+  await expect(page.locator('#chat-widget-messages .chat-message')).toHaveCount(190);
   await capture(page, testInfo, 'league-chat');
   monitor.assertClean();
 });
@@ -158,6 +163,10 @@ test('mobile nav and league picks stay usable', async ({ page, isMobile }, testI
   await page.getByRole('button', { name: 'Toggle navigation' }).click();
   await expect(nav).toBeVisible();
   await expect(page.getByRole('link', { name: 'Make A Pick' })).toBeVisible();
+  await page.getByRole('button', { name: 'League Chat' }).click();
+  await expect(page.locator('#chat-widget')).toHaveClass(/is-open/);
+  await page.locator('#chat-widget-close').click();
+  await expect(page.locator('#chat-widget')).not.toHaveClass(/is-open/);
 
   await page.getByRole('link', { name: 'Make A Pick' }).click();
   await expect(page.getByRole('heading', { name: 'Make Your Pick' })).toBeVisible();

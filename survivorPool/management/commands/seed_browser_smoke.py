@@ -185,7 +185,7 @@ class Command(BaseCommand):
             author_name, body = chat_lines[i % len(chat_lines)]
             ChatMessage.objects.create(
                 author=users_by_name[author_name],
-                body=body if i < len(chat_lines) else f'{body} #{i}',
+                body=body,
             )
 
         ChatMessage.objects.create(

@@ -25,6 +25,7 @@ urlpatterns = [
     path('allPicks/', all_picks_view, name="allPicks"),
     path('chat/', chat_views.chat_view, name="chat"),
     path('chat/poll/', chat_views.chat_poll_api, name="chat_poll"),
+    path('chat/send/', chat_views.chat_send_api, name="chat_send"),
     path('rules/', rules_view, name="rules"),
     path('pot/', pot_view, name="pot"),
 ]

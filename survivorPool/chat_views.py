@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_POST
 
 from .models import ChatMessage
 
@@ -49,3 +49,30 @@ def chat_poll_api(request):
         for msg in qs
     ]
     return JsonResponse({'messages': payload})
+
+
+@login_required
+@require_POST
+def chat_send_api(request):
+    body = (request.POST.get('body') or '').strip()
+    if not body:
+        return JsonResponse({'error': 'Message cannot be empty.'}, status=400)
+    if len(body) > 2000:
+        return JsonResponse({'error': 'Message is too long.'}, status=400)
+
+    msg = ChatMessage.objects.create(
+        author=request.user,
+        body=body,
+        message_type=ChatMessage.MESSAGE_USER,
+    )
+    return JsonResponse({
+        'message': {
+            'id': msg.id,
+            'author': request.user.username,
+            'body': msg.body,
+            'message_type': msg.message_type,
+            'week': msg.week,
+            'created_at': msg.created_at.strftime('%b %d, %I:%M %p'),
+            'is_system': False,
+        }
+    })
