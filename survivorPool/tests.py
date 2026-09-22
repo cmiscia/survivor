@@ -737,7 +737,9 @@ class LockWeekCommandTests(TestCase):
                 missed_deadline=True,
             ).exists()
         )
-        self.assertFalse(Pick.objects.filter(user_name=stranger, week=3).exists())
+        stranger_pick = Pick.objects.get(user_name=stranger, week=3)
+        self.assertFalse(stranger_pick.is_win)
+        self.assertTrue(stranger_pick.missed_deadline)
         self.assertTrue(WeekLockRun.objects.filter(week=3).exists())
         msg = ChatMessage.objects.get(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK)
         self.assertIn('Week 3', msg.body)

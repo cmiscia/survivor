@@ -183,13 +183,9 @@ def build_leaderboard_rows() -> list[dict[str, Any]]:
 
 
 def get_league_member_usernames() -> list[str]:
-    """Users who have submitted at least one real pick."""
+    """All active users who participate in the league."""
     return list(
-        Pick.objects.filter(
-            missed_deadline=False,
-            user_name__is_active=True,
-        )
-        .order_by('user_name__username')
-        .values_list('user_name__username', flat=True)
-        .distinct()
+        User.objects.filter(is_active=True)
+        .order_by('username')
+        .values_list('username', flat=True)
     )
