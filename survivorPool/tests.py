@@ -610,6 +610,43 @@ class UtilsTests(TestCase):
         self.assertEqual(grid['pick_lookup'][(1, 'alice')]['team'], '')
         self.assertEqual(grid['pick_lookup'][(1, 'alice')]['status'], 'LOSS')
         self.assertTrue(grid['pick_lookup'][(1, 'alice')]['missed_deadline'])
+
+    def test_build_picks_grid_hides_pick_until_selected_team_kicks_off(self):
+        user = User.objects.create_user(username='alice')
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        Game.objects.create(
+            season_year=2026,
+            week=3,
+            home_team=bills,
+            away_team=dolphins,
+            game_time=timezone.now() + datetime.timedelta(hours=1),
+        )
+        Pick.objects.create(user_name=user, team=bills, week=3)
+
+        grid = build_picks_grid(max_week=3)
+
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['team'], '')
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['status'], '')
+
+    def test_build_picks_grid_reveals_pick_after_selected_team_kicks_off(self):
+        user = User.objects.create_user(username='alice')
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        Game.objects.create(
+            season_year=2026,
+            week=3,
+            home_team=bills,
+            away_team=dolphins,
+            game_time=timezone.now() - datetime.timedelta(minutes=1),
+        )
+        Pick.objects.create(user_name=user, team=bills, week=3)
+
+        grid = build_picks_grid(max_week=3)
+
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['team'], 'Bills')
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['status'], 'TBD')
+
     def test_leaderboard_includes_staff_and_superusers(self):
         User.objects.create_superuser(username='admin', password='password')
         player = User.objects.create_user(username='player')

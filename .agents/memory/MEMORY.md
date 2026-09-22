@@ -2,3 +2,4 @@
 - [Development Preview framing](development-preview-framing.md) — Replit Preview requires iframe access in DEBUG mode; keep production framing denied.
 - [Portable npm lockfiles](portable-npm-lockfiles.md) — CI cannot resolve Replit-internal package URLs; committed lockfiles must use public registry URLs.
 - [Weekly results finalization](weekly-results-finalization.md) — Post Results is the sole end-of-week action and assigns losses to every active user without a pick.
+- [League pick privacy](league-pick-privacy.md) — hide each selection on League Picks until that selected team's game has kicked off.
