@@ -438,8 +438,7 @@ def league_operations_view(request):
         commands = {
             'schedule': ('fetch_nfl_schedule', 'Schedule sync', {'year': settings.NFL_SEASON_YEAR}),
             'odds': ('fetch_nfl_odds', 'Odds refresh', {'year': settings.NFL_SEASON_YEAR}),
-            'deadline': ('lock_week_and_post_chat', 'Week finalization', {}),
-            'results': ('fetch_nfl_winners', 'Week results', {}),
+            'results': ('post_week_results', 'Week results', {}),
         }
         command_config = commands.get(action)
         if command_config:

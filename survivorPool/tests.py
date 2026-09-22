@@ -511,6 +511,25 @@ class BaseNavigationTests(TestCase):
         self.assertEqual(kwargs['week'], 2)
         self.assertEqual(kwargs['year'], 2026)
 
+    @patch('survivorPool.views.call_command')
+    def test_post_results_runs_combined_finalization_command(self, command):
+        User.objects.create_user(
+            username='operator',
+            password='password',
+            is_staff=True,
+        )
+        self.client.login(username='operator', password='password')
+
+        response = self.client.post(
+            '/league-operations/',
+            {'action': 'results', 'week': '1'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        args, kwargs = command.call_args
+        self.assertEqual(args[0], 'post_week_results')
+        self.assertEqual(kwargs['week'], 1)
+
     def test_pot_is_removed_from_navigation_and_redirects_to_leaderboard(self):
         User.objects.create_user(
             username='player',
@@ -756,6 +775,35 @@ class LockWeekCommandTests(TestCase):
 
         self.assertEqual(Pick.objects.filter(user_name=user, week=3, missed_deadline=True).count(), 1)
         self.assertEqual(ChatMessage.objects.filter(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK, week=3).count(), 1)
+
+
+class PostWeekResultsCommandTests(TestCase):
+    @patch('survivorPool.management.commands.post_week_results.call_command')
+    @patch(
+        'survivorPool.management.commands.post_week_results.all_week_games_started',
+        return_value=True,
+    )
+    def test_post_results_finalizes_before_fetching_winners(self, games_started, command):
+        call_command('post_week_results', '--week=1')
+
+        self.assertEqual(command.call_count, 2)
+        self.assertEqual(command.call_args_list[0].args[0], 'lock_week_and_post_chat')
+        self.assertTrue(command.call_args_list[0].kwargs['force'])
+        self.assertEqual(command.call_args_list[1].args[0], 'fetch_nfl_winners')
+
+    @patch('survivorPool.management.commands.post_week_results.call_command')
+    @patch(
+        'survivorPool.management.commands.post_week_results.all_week_games_started',
+        return_value=False,
+    )
+    def test_post_results_refuses_while_games_are_available(self, games_started, command):
+        with self.assertRaisesMessage(
+            Exception,
+            'Week 1 still has games available',
+        ):
+            call_command('post_week_results', '--week=1')
+
+        command.assert_not_called()
 
 
 class ChatViewTests(TestCase):

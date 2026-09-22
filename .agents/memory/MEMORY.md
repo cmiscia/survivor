@@ -1,3 +1,4 @@
 - [Shared season database](shared-season-database.md) — development management commands can change live league data because both environments use the shared Neon secret.
 - [Development Preview framing](development-preview-framing.md) — Replit Preview requires iframe access in DEBUG mode; keep production framing denied.
 - [Portable npm lockfiles](portable-npm-lockfiles.md) — CI cannot resolve Replit-internal package URLs; committed lockfiles must use public registry URLs.
+- [Weekly results finalization](weekly-results-finalization.md) — Post Results is the sole end-of-week action and assigns losses to every active user without a pick.
