@@ -12,6 +12,25 @@ from .utils import all_week_games_started, build_leaderboard_rows, build_picks_g
 from .views import AddPickView
 
 
+class HomeViewTests(TestCase):
+    def test_picks_are_displayed_in_week_order_not_submission_order(self):
+        user = User.objects.create_user(username='player')
+        other_user = User.objects.create_user(username='other')
+        team = Team.objects.create(team_name='Bills')
+        for week in (3, 1, 2):
+            Pick.objects.create(user_name=user, team=team, week=week)
+        Pick.objects.create(user_name=other_user, team=team, week=4)
+        self.client.force_login(user)
+
+        response = self.client.get('/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [pick.week for pick in response.context['object_list']],
+            [1, 2, 3],
+        )
+
+
 class AddPickViewTests(TestCase):
     def test_display_week_defaults_to_next_loaded_unpicked_week(self):
         user = User.objects.create_user(username='miscia')

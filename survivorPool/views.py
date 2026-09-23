@@ -63,14 +63,13 @@ NFL_TEAM_LOGOS = {
 class HomeView(ListView):
     model = Pick
     template_name = 'home.html'
-    ordering = ['week']
 
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Pick.objects.none()
         return Pick.objects.filter(
             user_name=self.request.user,
-        ).select_related('team', 'user_name')
+        ).select_related('team', 'user_name').order_by('week')
 
 
 class AddPickView(LoginRequiredMixin, CreateView):
