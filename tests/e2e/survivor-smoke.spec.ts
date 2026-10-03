@@ -135,6 +135,8 @@ test('make a pick defaults to current week and supports outer weeks', async ({ p
 
   await expect(page.getByRole('heading', { name: 'Make Your Pick' })).toBeVisible();
   await expect(page.locator('select[name="week"]')).toHaveValue('1');
+  await expect(page.getByRole('button', { name: 'Previous week' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Next week' })).toBeVisible();
   await expect(page.locator('.matchup-card')).toHaveCount(3);
   await expect(page.getByRole('button', { name: 'Submit Pick' })).toBeDisabled();
   await expectNoBrokenText(page);
