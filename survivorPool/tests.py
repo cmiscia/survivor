@@ -37,6 +37,14 @@ class AddPickViewTests(TestCase):
 
         self.assertEqual(view._get_display_week(), 3)
 
+    def test_add_pick_page_defaults_to_current_week(self):
+        user = User.objects.create_user(username='miscia', password='password')
+        self.client.force_login(user)
+        with patch.object(AddPickView, '_get_current_nfl_week', return_value=4):
+            response = self.client.get('/add_pick/')
+        self.assertEqual(response.context['display_week'], 4)
+        self.assertEqual(response.context['current_week'], 4)
+
     def test_display_week_does_not_fall_back_to_past_loaded_week(self):
         user = User.objects.create_user(username='miscia')
         cardinals = Team.objects.create(team_name='Cardinals')
