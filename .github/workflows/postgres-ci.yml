@@ -71,14 +71,14 @@ jobs:
 
       - name: Verify migrations render and apply on Postgres
         run: |
-          python manage.py makemigrations survivorPool --check --dry-run
+          python manage.py makemigrations survivorPool members --check --dry-run
           python manage.py migrate --plan
           python manage.py migrate --noinput
 
       - name: Run Django checks and tests on Postgres
         run: |
           python manage.py check
-          python manage.py test survivorPool
+          python manage.py test survivorPool members
 
       - name: Run Chromium smoke tests on Postgres
         run: node node_modules/@playwright/test/cli.js test

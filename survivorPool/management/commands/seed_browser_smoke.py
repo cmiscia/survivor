@@ -104,7 +104,10 @@ class Command(BaseCommand):
         )
 
         base = timezone.make_aware(
-            datetime.datetime(settings.NFL_SEASON_YEAR, 9, 13, 13, 0),
+            datetime.datetime.combine(
+                settings.NFL_SEASON_START_DATE + datetime.timedelta(days=4),
+                datetime.time(13, 0),
+            ),
             timezone.get_current_timezone(),
         )
         games = [

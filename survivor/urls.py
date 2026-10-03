@@ -22,6 +22,5 @@ urlpatterns = [
     #path("survivorPool/", include("survivorPool.urls")),
     path("admin/", admin.site.urls),
     path('', include('survivorPool.urls')),
-    path('members/', include('django.contrib.auth.urls')), # point members to the auth system
     path('members/', include('members.urls')),
 ]

@@ -32,9 +32,13 @@ export default defineConfig({
       DJANGO_DEBUG: 'True',
       DJANGO_ALLOWED_HOSTS: 'localhost,127.0.0.1,testserver',
       NEON_DATABASE_URL: '',
+      SENTRY_DSN: '',
+      EMAIL_BACKEND: 'django.core.mail.backends.locmem.EmailBackend',
+      LEAGUE_SITE_URL: 'http://127.0.0.1:8005',
       DATABASE_URL: process.env.DATABASE_URL || 'sqlite:///browser-test.sqlite3',
       NFL_SEASON_YEAR: '2026',
-      NFL_SEASON_START_DATE: '2026-09-09',
+      // Keep the smoke fixture in week one regardless of the calendar date.
+      NFL_SEASON_START_DATE: new Date().toISOString().slice(0, 10),
     },
   },
   projects: [

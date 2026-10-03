@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>League accounts</h1>
+<p class="text-muted">Invite one person at a time. Each person chooses their own password.</p>
+{% for message in messages %}<p class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}" role="status">{{ message }}</p>{% endfor %}
+<section class="auth-panel account-invite" aria-labelledby="invite-title">
+  <h2 id="invite-title">Invite a member</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">Create account &amp; send invitation</button>
+  </form>
+</section>
+<h2 class="mt-4">Members</h2>
+<ul class="account-list">
+{% for account in accounts %}
+  <li class="account-row">
+    <div>
+      <strong>{{ account.username }}</strong>
+      <p>{{ account.email|default:'No email — ask an administrator to add one' }}</p>
+      <span>{% if not account.is_active %}Inactive{% elif not account.has_usable_password %}Awaiting password setup{% else %}Active{% endif %}{% if account.is_staff or account.is_superuser %} · Staff{% endif %}</span>
+    </div>
+    {% if account.is_active and not account.is_staff and not account.is_superuser and account.pk != user.pk %}
+    <div class="account-actions">
+      {% if account.email %}
+      <form method="post" action="{% url 'member_account_action' account.pk %}">
+        {% csrf_token %}
+        <button name="action" value="resend" class="btn btn-secondary" type="submit">Send setup/reset link<span class="visually-hidden"> for {{ account.username }}</span></button>
+      </form>
+      {% endif %}
+      <details>
+        <summary>Deactivate {{ account.username }}</summary>
+        <p>This blocks access and preserves existing picks.</p>
+        <form method="post" action="{% url 'member_account_action' account.pk %}">
+          {% csrf_token %}
+          <button name="action" value="deactivate" class="btn btn-danger" type="submit">Confirm deactivation</button>
+        </form>
+      </details>
+    </div>
+    {% endif %}
+  </li>
+{% empty %}<li>No accounts yet.</li>{% endfor %}
+</ul>
+{% endblock %}

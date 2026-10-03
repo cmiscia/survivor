@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <section class="col-md-6 auth-panel" aria-labelledby="auth-title">
+    <p class="eyebrow">League Access</p>
+    {% block auth_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

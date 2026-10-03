@@ -78,15 +78,49 @@ test('anonymous pages render cleanly', async ({ page }, testInfo) => {
   await expectReadableButton(page, 'Login');
   await expectNoBrokenText(page);
 
-  await page.goto('/members/register/');
-  await expect(page.getByRole('heading', { name: 'Register' })).toBeVisible();
-  await expectReadableButton(page, 'Create Account');
+  await page.getByRole('link', { name: 'Forgot your password?' }).click();
+  await expect(page.getByRole('heading', { name: 'Forgot your password?' })).toBeVisible();
+  await expectReadableButton(page, 'Send password link');
+  await capture(page, testInfo, 'password-reset');
+  await page.getByLabel('Email').fill('unknown@example.com');
+  await page.getByRole('button', { name: 'Send password link' }).click();
+  await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible();
   await expectNoBrokenText(page);
 
   await page.goto('/rules/');
   await expect(page.getByRole('heading', { name: 'League Rules' })).toBeVisible();
   await expectNoBrokenText(page);
 
+  monitor.assertClean();
+});
+
+test('staff can invite and deactivate a league account', async ({ page }, testInfo) => {
+  const monitor = await watchPage(page);
+  const username = `invited_${testInfo.project.name.replaceAll('-', '_')}_${Date.now()}`;
+  await page.goto('/members/login/');
+  await page.getByLabel('Username').fill('admin_user');
+  await page.getByLabel('Password:', { exact: true }).fill('Test4321!');
+  await page.getByRole('button', { name: 'Login', exact: true }).click();
+  await expect(page).toHaveURL('/');
+  await page.goto('/members/accounts/');
+  await expect(page.getByRole('heading', { name: 'League accounts' })).toBeVisible();
+  await page.getByLabel('Username').fill(username);
+  await page.getByLabel('Email').fill(`${username}@example.com`);
+  await page.getByRole('button', { name: 'Create account & send invitation' }).click();
+  await expect(page.getByRole('status')).toHaveText('Account created and invitation sent.');
+  const row = page.locator('.account-row').filter({ has: page.getByText(username, { exact: true }) });
+  await expect(row).toContainText('Awaiting password setup');
+  await row.getByRole('button', { name: /Send setup\/reset link/ }).click();
+  await expect(page.getByRole('status')).toHaveText('Password setup/reset link sent.');
+  await capture(page, testInfo, 'league-accounts');
+  await row.locator('summary').click();
+  await row.getByRole('button', { name: 'Confirm deactivation' }).click();
+  await expect(row).toContainText('Inactive');
+  await expect(row.getByRole('button')).toHaveCount(0);
+  await page.goto('/members/password_change/');
+  await expect(page.getByRole('heading', { name: 'Change password' })).toBeVisible();
+  await capture(page, testInfo, 'password-change');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   monitor.assertClean();
 });
 
