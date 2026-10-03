@@ -13,7 +13,7 @@ from .views import AddPickView
 
 
 class AddPickViewTests(TestCase):
-    def test_display_week_defaults_to_next_loaded_unpicked_week(self):
+    def test_display_week_does_not_jump_to_future_loaded_week(self):
         user = User.objects.create_user(username='miscia')
         cardinals = Team.objects.create(team_name='Cardinals', current_week=1)
         Team.objects.create(team_name='Bills', current_week=7)
@@ -24,7 +24,8 @@ class AddPickViewTests(TestCase):
         view = AddPickView()
         view.request = request
 
-        self.assertEqual(view._get_display_week(), 7)
+        with patch.object(view, '_get_current_nfl_week', return_value=4):
+            self.assertEqual(view._get_display_week(), 4)
 
     def test_query_param_week_takes_precedence(self):
         Team.objects.create(team_name='Bills', current_week=7)
@@ -36,7 +37,7 @@ class AddPickViewTests(TestCase):
 
         self.assertEqual(view._get_display_week(), 3)
 
-    def test_display_week_uses_loaded_game_schedule(self):
+    def test_display_week_does_not_fall_back_to_past_loaded_week(self):
         user = User.objects.create_user(username='miscia')
         cardinals = Team.objects.create(team_name='Cardinals')
         bills = Team.objects.create(team_name='Bills')
@@ -50,7 +51,8 @@ class AddPickViewTests(TestCase):
         view = AddPickView()
         view.request = request
 
-        self.assertEqual(view._get_display_week(), 2)
+        with patch.object(view, '_get_current_nfl_week', return_value=4):
+            self.assertEqual(view._get_display_week(), 4)
 
     def test_biggest_favorite_uses_lowest_moneyline(self):
         view = AddPickView()
@@ -147,7 +149,7 @@ class AddPickViewTests(TestCase):
         response = self.client.get('/add_pick/?week=3')
 
         self.assertFalse(response.context['has_available_team'])
-        self.assertContains(response, 'This week will be recorded as a No Pick loss.')
+        self.assertContains(response, 'No teams are available for this week.')
 
 
 class PostFormTests(TestCase):
@@ -453,7 +455,7 @@ class BaseNavigationTests(TestCase):
 
         self.assertContains(response, 'Admin Console')
         self.assertContains(response, 'href="/admin/"')
-        self.assertContains(response, 'nav-link-admin')
+        self.assertContains(response, 'Admin Console')
 
     def test_regular_user_does_not_see_admin_console_link(self):
         User.objects.create_user(
@@ -778,3 +780,40 @@ class ChatViewTests(TestCase):
         payload = response.json()
         self.assertEqual(len(payload['messages']), 200)
         self.assertEqual(payload['messages'][0]['body'], 'message 5')
+
+
+class LeagueUsabilityTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='viewer')
+        self.client.force_login(self.user)
+
+    def test_unloaded_schedule_does_not_announce_a_loss(self):
+        response = self.client.get('/add_pick/?week=4')
+        self.assertContains(response, 'No matchups found for Week 4')
+        self.assertNotContains(response, 'No teams are available')
+        self.assertNotContains(response, 'will be recorded as a No Pick loss')
+
+    def test_week_board_shows_selected_week_and_marks_missed_pick(self):
+        team = Team.objects.create(team_name='Bills')
+        Pick.objects.create(user_name=self.user, team=team, week=2, is_win=True)
+        Pick.objects.create(user_name=self.user, team=team, week=3, is_win=False, missed_deadline=True)
+        response = self.client.get('/allPicks/?week=2')
+        self.assertEqual(response.context['selected_week'], 2)
+        self.assertEqual(response.context['current_week_cards'][0]['team'], 'Bills')
+        response = self.client.get('/allPicks/?week=3')
+        self.assertContains(response, 'No pick recorded')
+        for invalid in ['oops', '0', '19']:
+            response = self.client.get('/allPicks/', {'week': invalid})
+            self.assertEqual(response.context['selected_week'], response.context['current_nfl_week'])
+
+    def test_dashboard_summarizes_only_own_picks_newest_first(self):
+        team = Team.objects.create(team_name='Bills')
+        other = User.objects.create_user(username='other')
+        Pick.objects.create(user_name=other, team=team, week=1, is_win=True)
+        Pick.objects.create(user_name=self.user, team=team, week=1, is_win=False)
+        Pick.objects.create(user_name=self.user, team=team, week=2, is_win=None)
+        response = self.client.get('/')
+        self.assertEqual(response.context['wins'], 0)
+        self.assertEqual(response.context['losses'], 1)
+        self.assertEqual(response.context['pending'], 1)
+        self.assertEqual([p.week for p in response.context['object_list']], [2, 1])
