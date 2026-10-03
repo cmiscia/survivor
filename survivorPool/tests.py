@@ -756,6 +756,47 @@ class LockWeekCommandTests(TestCase):
         self.assertEqual(ChatMessage.objects.filter(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK, week=3).count(), 1)
 
 
+class WinnersCommandTests(TestCase):
+    @patch('survivorPool.management.commands.fetch_nfl_winners.get_nfl_weekly_winners')
+    def test_results_require_finalization(self, get_winners):
+        from django.core.management import call_command
+        from django.core.management.base import CommandError
+
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        Game.objects.create(
+            season_year=2026,
+            week=3,
+            home_team=bills,
+            away_team=dolphins,
+            game_time=timezone.now() - datetime.timedelta(hours=1),
+        )
+
+        with self.assertRaisesRegex(CommandError, 'must be finalized'):
+            call_command('fetch_nfl_winners', '--week=3')
+        get_winners.assert_not_called()
+
+    @patch('survivorPool.management.commands.fetch_nfl_winners.get_nfl_weekly_winners', return_value=[])
+    def test_results_require_all_games_to_have_started(self, get_winners):
+        from django.core.management import call_command
+        from django.core.management.base import CommandError
+
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        Game.objects.create(
+            season_year=2026,
+            week=3,
+            home_team=bills,
+            away_team=dolphins,
+            game_time=timezone.now() + datetime.timedelta(hours=1),
+        )
+        WeekLockRun.objects.create(season_year=2026, week=3)
+
+        with self.assertRaisesRegex(CommandError, 'still has games available'):
+            call_command('fetch_nfl_winners', '--week=3')
+        get_winners.assert_not_called()
+
+
 class ChatViewTests(TestCase):
     def test_chat_api_returns_timestamp_with_timezone(self):
         user = User.objects.create_user(username='chatter', password='password')

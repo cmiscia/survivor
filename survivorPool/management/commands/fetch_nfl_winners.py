@@ -1,10 +1,11 @@
 # your_app/management/commands/fetch_nfl_winners.py
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from survivorPool.tasks.nfl import get_nfl_weekly_winners
 from datetime import datetime
-from survivorPool.models import Pick, Team
+from survivorPool.models import Pick, Team, WeekLockRun
+from survivorPool.utils import all_week_games_started
 
 
 def get_current_nfl_week(season_start_date):
@@ -35,6 +36,20 @@ class Command(BaseCommand):
             current_week = get_current_nfl_week(season_start_date)
         else:
             current_week = week
+
+        # Results must follow finalization: posting early could mark a partial
+        # schedule complete and leave later games unaccounted for.
+        if not all_week_games_started(current_week):
+            raise CommandError(
+                f'Week {current_week} still has games available or missing kickoff times.'
+            )
+        if not WeekLockRun.objects.filter(
+            season_year=current_year,
+            week=current_week,
+        ).exists():
+            raise CommandError(
+                f'Week {current_week} must be finalized before posting results.'
+            )
 
         results = get_nfl_weekly_winners(current_year, current_week)
 
