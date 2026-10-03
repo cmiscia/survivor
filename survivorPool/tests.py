@@ -817,3 +817,8 @@ class LeagueUsabilityTests(TestCase):
         self.assertEqual(response.context['losses'], 1)
         self.assertEqual(response.context['pending'], 1)
         self.assertEqual([p.week for p in response.context['object_list']], [2, 1])
+
+    def test_protected_pages_redirect_to_the_real_login_page(self):
+        self.client.logout()
+        response = self.client.get('/allPicks/')
+        self.assertRedirects(response, '/members/login/?next=/allPicks/')
