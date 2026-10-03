@@ -12,9 +12,19 @@
 
     <input type="hidden" name="user_name" id="user" value="{{ user.id }}">
 
-    <div class="week-selector mb-3">
-        <label for="{{ form.week.id_for_label }}" class="form-label fw-semibold">Week</label>
-        {{ form.week }}
+    <section class="week-picker" aria-labelledby="week-picker-title">
+        <div class="week-picker-copy">
+            <p class="eyebrow">Your schedule</p>
+            <h2 id="week-picker-title">Choose a week</h2>
+            <p>Pick from an upcoming week. A team's game locks your selection at kickoff.</p>
+        </div>
+        <div class="week-picker-controls">
+            <button type="button" class="week-step" data-week-step="-1" aria-label="Previous week">←</button>
+            <label class="visually-hidden" for="{{ form.week.id_for_label }}">Week</label>
+            {{ form.week }}
+            <button type="button" class="week-step" data-week-step="1" aria-label="Next week">→</button>
+        </div>
+        <span class="week-current-note">Viewing Week {{ display_week }}{% if display_week == current_week %} · Current week{% endif %}</span>
         {% if form.week.errors %}
         <div class="text-danger small mt-1">{{ form.week.errors }}</div>
         {% endif %}
@@ -168,6 +178,15 @@ document.addEventListener('DOMContentLoaded', function() {
             var url = new URL(window.location.href);
             url.searchParams.set('week', this.value);
             window.location.href = url.toString();
+        });
+        document.querySelectorAll('[data-week-step]').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var nextWeek = Number(weekSelect.value) + Number(button.dataset.weekStep);
+                if (nextWeek >= 1 && nextWeek <= 18) {
+                    weekSelect.value = String(nextWeek);
+                    weekSelect.dispatchEvent(new Event('change'));
+                }
+            });
         });
     }
 });
