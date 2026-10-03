@@ -22,7 +22,9 @@ export default defineConfig({
     command: [
       `${quotedPython} manage.py migrate --noinput`,
       `${quotedPython} manage.py seed_browser_smoke`,
-      `${quotedPython} manage.py runserver 127.0.0.1:8005`,
+      // Avoid Django's Windows autoreloader leaving a child process behind when
+      // Playwright tears down the web server after a run.
+      `${quotedPython} manage.py runserver 127.0.0.1:8005 --noreload`,
     ].join(' && '),
     url: 'http://127.0.0.1:8005',
     reuseExistingServer: !process.env.CI,
