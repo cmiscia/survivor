@@ -144,6 +144,10 @@ test('make a pick defaults to current week and supports outer weeks', async ({ p
   await page.locator('select[name="week"]').selectOption('7');
   await page.waitForURL(/week=7/);
   await expect(page.locator('select[name="week"]')).toHaveValue('7');
+  await page.getByRole('button', { name: 'Previous week' }).click();
+  await page.waitForURL(/week=6/);
+  await page.getByRole('button', { name: 'Next week' }).click();
+  await page.waitForURL(/week=7/);
   await expect(page.locator('.matchup-card')).toHaveCount(3);
   await expect(page.locator('label.team-card', { hasText: 'Bills' }).locator('input[name="team"]')).toBeDisabled();
 
@@ -179,6 +183,12 @@ test('mobile nav and league picks stay usable', async ({ page, isMobile }, testI
   await page.getByRole('link', { name: 'Make A Pick' }).click();
   await expect(page.getByRole('heading', { name: 'Make Your Pick' })).toBeVisible();
   await expect(page.locator('.team-card').first()).toBeVisible();
+  // Tables may scroll within their container; the phone page itself must not.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth))
+    .toBeLessThanOrEqual((page.viewportSize()?.width || 0) + 1);
+  const weekControl = page.locator('select[name="week"]');
+  expect(await weekControl.evaluate(el => parseFloat(getComputedStyle(el).fontSize)))
+    .toBeGreaterThanOrEqual(16);
   await expectNoBrokenText(page);
 
   monitor.assertClean();

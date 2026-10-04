@@ -32,6 +32,7 @@ export default defineConfig({
     env: {
       ...process.env,
       DJANGO_DEBUG: 'True',
+      DJANGO_LOCAL_HTTP: '1',
       DJANGO_ALLOWED_HOSTS: 'localhost,127.0.0.1,testserver',
       NEON_DATABASE_URL: '',
       DATABASE_URL: process.env.DATABASE_URL || 'sqlite:///browser-test.sqlite3',
@@ -40,6 +41,8 @@ export default defineConfig({
     },
   },
   projects: [
+    // Most members use iPhones; Chromium emulation alone misses Safari regressions.
+    { name: 'iphone-webkit', use: { ...devices['iPhone 13'] } },
     {
       name: 'desktop-chromium',
       use: {
