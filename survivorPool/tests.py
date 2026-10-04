@@ -757,6 +757,35 @@ class LockWeekCommandTests(TestCase):
 
 
 class WinnersCommandTests(TestCase):
+    @patch('survivorPool.management.commands.fetch_nfl_winners.get_current_nfl_week', return_value=0)
+    @patch('survivorPool.management.commands.fetch_nfl_winners.get_nfl_weekly_winners')
+    def test_preseason_is_a_noop(self, get_winners, get_week):
+        call_command('fetch_nfl_winners')
+        get_winners.assert_not_called()
+
+    @patch('survivorPool.management.commands.fetch_nfl_winners.get_nfl_weekly_winners')
+    def test_finalized_week_scores_picks_without_changing_other_weeks(self, get_winners):
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        user = User.objects.create_user(username='scored')
+        winner = Pick.objects.create(user_name=user, team=bills, week=3)
+        loser = Pick.objects.create(user_name=User.objects.create_user(username='loser'), team=dolphins, week=3)
+        later = Pick.objects.create(user_name=user, team=dolphins, week=4)
+        Game.objects.create(season_year=2026, week=3, home_team=bills,
+                            away_team=dolphins, game_time=timezone.now() - datetime.timedelta(hours=4))
+        WeekLockRun.objects.create(season_year=2026, week=3)
+        get_winners.return_value = [{'winner': 'Buffalo Bills', 'loser': 'Miami Dolphins'}]
+
+        call_command('fetch_nfl_winners', week=3)
+
+        get_winners.assert_called_once_with(2026, 3)
+        winner.refresh_from_db()
+        loser.refresh_from_db()
+        later.refresh_from_db()
+        self.assertIs(winner.is_win, True)
+        self.assertIs(loser.is_win, False)
+        self.assertIsNone(later.is_win)
+
     @patch('survivorPool.management.commands.fetch_nfl_winners.get_nfl_weekly_winners')
     def test_results_require_finalization(self, get_winners):
         from django.core.management import call_command

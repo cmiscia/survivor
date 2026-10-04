@@ -37,8 +37,12 @@ class Command(BaseCommand):
         else:
             current_week = week
 
-        # Results must follow finalization: posting early could mark a partial
-        # schedule complete and leave later games unaccounted for.
+        if current_week == 0:
+            self.stdout.write(self.style.WARNING("NFL regular season hasn't started yet."))
+            return
+
+        # Finalize missing picks before scoring so standings include No Pick
+        # losses. A forced early finalization must not bypass open pick windows.
         if not all_week_games_started(current_week):
             raise CommandError(
                 f'Week {current_week} still has games available or missing kickoff times.'
@@ -52,10 +56,6 @@ class Command(BaseCommand):
             )
 
         results = get_nfl_weekly_winners(current_year, current_week)
-
-        if current_week == 0:
-            self.stdout.write(self.style.WARNING("NFL regular season hasn't started yet."))
-            return
 
         wins_updated = 0
         losses_updated = 0
