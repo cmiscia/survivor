@@ -159,6 +159,29 @@ test('make a pick defaults to current week and supports outer weeks', async ({ p
   monitor.assertClean();
 });
 
+test('a new member can submit and reload a pick', async ({ page }, testInfo) => {
+  // Separate accounts keep parallel browser projects from changing each other's picks.
+  const username = `submit_${testInfo.project.name}_${Date.now()}`;
+  await page.goto('/members/register/');
+  await page.locator('input[name="username"]').fill(username);
+  await page.locator('input[name="password1"]').fill('Test4321!');
+  await page.locator('input[name="password2"]').fill('Test4321!');
+  await page.getByRole('button', { name: 'Create Account' }).click();
+  await page.waitForURL('**/members/login/');
+  await page.locator('input[name="username"]').fill(username);
+  await page.locator('input[name="password"]').fill('Test4321!');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await expect(page.getByRole('heading', { name: `${username}'s Picks` })).toBeVisible();
+  await page.goto('/add_pick/?week=7');
+  await page.locator('label.team-card', { hasText: 'Patriots' }).click();
+  await page.getByRole('button', { name: 'Submit Pick' }).click();
+  await page.waitForURL('/');
+  await page.reload();
+  await expect(page.locator('.pick-card')).toHaveCount(1);
+  await expect(page.locator('.pick-card')).toContainText('Week 7');
+  await expect(page.locator('.pick-card')).toContainText('Patriots');
+});
+
 test('mobile nav and league picks stay usable', async ({ page, isMobile }, testInfo) => {
   test.skip(!isMobile, 'mobile-only layout smoke');
   const monitor = await watchPage(page);
