@@ -37,6 +37,7 @@ export default defineConfig({
       NEON_DATABASE_URL: '',
       DATABASE_URL: process.env.DATABASE_URL || 'sqlite:///browser-test.sqlite3',
       NFL_SEASON_YEAR: '2026',
+      // Keep the Week 1 fixture stable as the real calendar advances.
       NFL_SEASON_START_DATE: new Date().toISOString().slice(0, 10),
     },
   },
