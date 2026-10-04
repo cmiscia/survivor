@@ -3,3 +3,4 @@
 - [Portable npm lockfiles](portable-npm-lockfiles.md) — CI cannot resolve Replit-internal package URLs; committed lockfiles must use public registry URLs.
 - [Weekly results finalization](weekly-results-finalization.md) — Post Results is the sole end-of-week action and assigns losses to every active user without a pick.
 - [League pick privacy](league-pick-privacy.md) — hide each selection on League Picks until that selected team's game has kicked off.
+- [Calendar-independent browser tests](browser-test-calendar.md) — browser fixtures must work throughout the season; never alter production week defaults to satisfy dated tests.
