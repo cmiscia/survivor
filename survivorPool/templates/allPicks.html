@@ -12,7 +12,7 @@
         <span class="picks-badge win">WIN</span>
         <span class="picks-badge loss">LOSS</span>
         <span class="picks-badge tbd">Pending</span>
-        <span class="picks-badge empty">Not submitted</span>
+        <span class="picks-badge empty">Not revealed</span>
     </div>
 </div>
 
@@ -28,7 +28,7 @@
         {% for card in current_week_cards %}
         <div class="week-summary-card picks-cell--{{ card.status|lower }}">
             <span class="week-summary-player">{{ card.player }}{% if card.player == user.username %} <small>(you)</small>{% endif %}</span>
-            <span class="week-summary-team">{% if card.missed_deadline %}No pick recorded{% elif card.team == "-" %}Not submitted{% else %}{{ card.team }}{% endif %}</span>
+            <span class="week-summary-team">{% if card.missed_deadline %}No pick recorded{% elif card.team == "-" %}Not revealed{% else %}{{ card.team }}{% endif %}</span>
             {% if card.status %}
             <span class="picks-badge {{ card.status|lower }}">{% if card.status == "TBD" %}Pending{% else %}{{ card.status|title }}{% endif %}</span>
             {% endif %}

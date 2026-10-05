@@ -897,6 +897,25 @@ class ChatViewTests(TestCase):
 
 
 class LeagueUsabilityTests(TestCase):
+    def test_board_preserves_pick_privacy_until_kickoff(self):
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        other = User.objects.create_user(username='private_picker')
+        game = Game.objects.create(season_year=2026, week=3, home_team=bills,
+                                   away_team=dolphins, game_time=timezone.now() + datetime.timedelta(hours=1))
+        Pick.objects.create(user_name=other, team=bills, week=3)
+
+        response = self.client.get('/allPicks/?week=3')
+        self.assertContains(response, 'Not revealed')
+        self.assertNotContains(response, 'Not submitted')
+        self.assertNotContains(response, 'Bills')
+        self.assertEqual(response.context['current_week_cards'][0]['team'], '-')
+
+        game.game_time = timezone.now() - datetime.timedelta(minutes=1)
+        game.save()
+        response = self.client.get('/allPicks/?week=3')
+        self.assertContains(response, 'Bills')
+
     def setUp(self):
         self.user = User.objects.create_user(username='viewer')
         self.client.force_login(self.user)
