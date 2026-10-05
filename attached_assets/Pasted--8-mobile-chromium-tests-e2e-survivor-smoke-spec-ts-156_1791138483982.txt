@@ -1,0 +1,87 @@
+✓  8 [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:156:5 › mobile nav and league picks stay usable (2.4s)
+
+
+  1) [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:126:5 › make a pick defaults to current week and supports outer weeks 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  locator('select[name="week"]')
+    Expected: "1"
+    Received: "4"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" with timeout 5000ms
+      - waiting for locator('select[name="week"]')
+        14 × locator resolved to <select name="week" id="id_week">…</select>
+           - unexpected value "4"
+
+
+      135 |
+      136 |   await expect(page.getByRole('heading', { name: 'Make Your Pick' })).toBeVisible();
+    > 137 |   await expect(page.locator('select[name="week"]')).toHaveValue('1');
+          |                                                     ^
+      138 |   await expect(page.locator('.matchup-card')).toHaveCount(3);
+      139 |   await expect(page.getByRole('button', { name: 'Submit Pick' })).toBeDisabled();
+      140 |   await expectNoBrokenText(page);
+        at /home/runner/work/survivor/survivor/tests/e2e/survivor-smoke.spec.ts:137:53
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:126:5 › make a pick defaults to current week and supports outer weeks 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator:  locator('select[name="week"]')
+    Expected: "1"
+    Received: "4"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveValue" with timeout 5000ms
+      - waiting for locator('select[name="week"]')
+        14 × locator resolved to <select name="week" id="id_week">…</select>
+           - unexpected value "4"
+
+
+      135 |
+      136 |   await expect(page.getByRole('heading', { name: 'Make Your Pick' })).toBeVisible();
+    > 137 |   await expect(page.locator('select[name="week"]')).toHaveValue('1');
+          |                                                     ^
+      138 |   await expect(page.locator('.matchup-card')).toHaveCount(3);
+      139 |   await expect(page.getByRole('button', { name: 'Submit Pick' })).toBeDisabled();
+      140 |   await expectNoBrokenText(page);
+        at /home/runner/work/survivor/survivor/tests/e2e/survivor-smoke.spec.ts:137:53
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:126:5 › make a pick defaults to current week and supports outer weeks 
+    [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:126:5 › make a pick defaults to current week and supports outer weeks 
+  1 skipped
+  5 passed (24.5s)
+Error: Process completed with exit code 1.

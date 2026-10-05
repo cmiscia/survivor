@@ -15,6 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         demo_usernames = [
             'browser_user',
+            'browser_picker',
             'rival_player',
             'admin_user',
             'alex_b',
@@ -41,6 +42,10 @@ class Command(BaseCommand):
             username='browser_user',
             password='Test4321!',
             email='browser@example.com',
+        )
+        browser_picker = User.objects.create_user(
+            username='browser_picker',
+            password='Test4321!',
         )
         rival = User.objects.create_user(
             username='rival_player',
@@ -103,10 +108,8 @@ class Command(BaseCommand):
             },
         )
 
-        base = timezone.make_aware(
-            datetime.datetime.combine(settings.NFL_SEASON_START_DATE + datetime.timedelta(days=4), datetime.time(13, 0)),
-            timezone.get_current_timezone(),
-        )
+        # Keep selectable games in the future, even when CI runs after the season.
+        base = timezone.now() + datetime.timedelta(days=1)
         games = [
             (1, 'Bills', 'Dolphins', 0, True),
             (1, 'Packers', 'Bears', 0, False),
@@ -166,6 +169,15 @@ class Command(BaseCommand):
                     is_win=result,
                     missed_deadline=team_name == 'No Pick',
                 )
+
+        # A missing Week 2 makes the default independent of the run date, while
+        # the Week 1 Bills pick exercises the no-team-reuse rule in Week 7.
+        Pick.objects.create(
+            user_name=browser_picker,
+            team=teams['Bills'],
+            week=1,
+            is_win=True,
+        )
 
         chat_lines = [
             ('alex_b', 'Bills looked way too obvious but I took them anyway.'),

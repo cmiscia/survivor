@@ -83,9 +83,18 @@ def build_picks_grid(max_week: int | None = None) -> dict[str, Any]:
         player = pick.user_name.username
         weeks_set.add(pick.week)
         players_set.add(player)
+        pick_is_visible = (
+            pick.missed_deadline
+            or pick.is_win is not None
+            or is_team_game_started(pick.team, pick.week)
+        )
         pick_lookup[(pick.week, player)] = {
-            'team': '' if pick.missed_deadline else pick.team.team_name,
-            'status': pick_status(pick.is_win),
+            'team': (
+                pick.team.team_name
+                if pick_is_visible and not pick.missed_deadline
+                else ''
+            ),
+            'status': pick_status(pick.is_win) if pick_is_visible else '',
             'missed_deadline': pick.missed_deadline,
         }
 
@@ -183,13 +192,9 @@ def build_leaderboard_rows() -> list[dict[str, Any]]:
 
 
 def get_league_member_usernames() -> list[str]:
-    """Users who have submitted at least one real pick."""
+    """All active users who participate in the league."""
     return list(
-        Pick.objects.filter(
-            missed_deadline=False,
-            user_name__is_active=True,
-        )
-        .order_by('user_name__username')
-        .values_list('user_name__username', flat=True)
-        .distinct()
+        User.objects.filter(is_active=True)
+        .order_by('username')
+        .values_list('username', flat=True)
     )

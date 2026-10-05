@@ -12,6 +12,25 @@ from .utils import all_week_games_started, build_leaderboard_rows, build_picks_g
 from .views import AddPickView
 
 
+class HomeViewTests(TestCase):
+    def test_picks_are_displayed_newest_week_first_not_submission_order(self):
+        user = User.objects.create_user(username='player')
+        other_user = User.objects.create_user(username='other')
+        team = Team.objects.create(team_name='Bills')
+        for week in (3, 1, 2):
+            Pick.objects.create(user_name=user, team=team, week=week)
+        Pick.objects.create(user_name=other_user, team=team, week=4)
+        self.client.force_login(user)
+
+        response = self.client.get('/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [pick.week for pick in response.context['object_list']],
+            [3, 2, 1],
+        )
+
+
 class AddPickViewTests(TestCase):
     def test_display_week_does_not_jump_to_future_loaded_week(self):
         user = User.objects.create_user(username='miscia')
@@ -521,6 +540,25 @@ class BaseNavigationTests(TestCase):
         self.assertEqual(kwargs['week'], 2)
         self.assertEqual(kwargs['year'], 2026)
 
+    @patch('survivorPool.views.call_command')
+    def test_post_results_runs_combined_finalization_command(self, command):
+        User.objects.create_user(
+            username='operator',
+            password='password',
+            is_staff=True,
+        )
+        self.client.login(username='operator', password='password')
+
+        response = self.client.post(
+            '/league-operations/',
+            {'action': 'results', 'week': '1'},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        args, kwargs = command.call_args
+        self.assertEqual(args[0], 'post_week_results')
+        self.assertEqual(kwargs['week'], 1)
+
     def test_pot_is_removed_from_navigation_and_redirects_to_leaderboard(self):
         User.objects.create_user(
             username='player',
@@ -601,6 +639,43 @@ class UtilsTests(TestCase):
         self.assertEqual(grid['pick_lookup'][(1, 'alice')]['team'], '')
         self.assertEqual(grid['pick_lookup'][(1, 'alice')]['status'], 'LOSS')
         self.assertTrue(grid['pick_lookup'][(1, 'alice')]['missed_deadline'])
+
+    def test_build_picks_grid_hides_pick_until_selected_team_kicks_off(self):
+        user = User.objects.create_user(username='alice')
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        Game.objects.create(
+            season_year=2026,
+            week=3,
+            home_team=bills,
+            away_team=dolphins,
+            game_time=timezone.now() + datetime.timedelta(hours=1),
+        )
+        Pick.objects.create(user_name=user, team=bills, week=3)
+
+        grid = build_picks_grid(max_week=3)
+
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['team'], '')
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['status'], '')
+
+    def test_build_picks_grid_reveals_pick_after_selected_team_kicks_off(self):
+        user = User.objects.create_user(username='alice')
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        Game.objects.create(
+            season_year=2026,
+            week=3,
+            home_team=bills,
+            away_team=dolphins,
+            game_time=timezone.now() - datetime.timedelta(minutes=1),
+        )
+        Pick.objects.create(user_name=user, team=bills, week=3)
+
+        grid = build_picks_grid(max_week=3)
+
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['team'], 'Bills')
+        self.assertEqual(grid['pick_lookup'][(3, 'alice')]['status'], 'TBD')
+
     def test_leaderboard_includes_staff_and_superusers(self):
         User.objects.create_superuser(username='admin', password='password')
         player = User.objects.create_user(username='player')
@@ -747,7 +822,9 @@ class LockWeekCommandTests(TestCase):
                 missed_deadline=True,
             ).exists()
         )
-        self.assertFalse(Pick.objects.filter(user_name=stranger, week=3).exists())
+        stranger_pick = Pick.objects.get(user_name=stranger, week=3)
+        self.assertFalse(stranger_pick.is_win)
+        self.assertTrue(stranger_pick.missed_deadline)
         self.assertTrue(WeekLockRun.objects.filter(week=3).exists())
         msg = ChatMessage.objects.get(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK)
         self.assertIn('Week 3', msg.body)
@@ -764,6 +841,35 @@ class LockWeekCommandTests(TestCase):
 
         self.assertEqual(Pick.objects.filter(user_name=user, week=3, missed_deadline=True).count(), 1)
         self.assertEqual(ChatMessage.objects.filter(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK, week=3).count(), 1)
+
+
+class PostWeekResultsCommandTests(TestCase):
+    @patch('survivorPool.management.commands.post_week_results.call_command')
+    @patch(
+        'survivorPool.management.commands.post_week_results.all_week_games_started',
+        return_value=True,
+    )
+    def test_post_results_finalizes_before_fetching_winners(self, games_started, command):
+        call_command('post_week_results', '--week=1')
+
+        self.assertEqual(command.call_count, 2)
+        self.assertEqual(command.call_args_list[0].args[0], 'lock_week_and_post_chat')
+        self.assertTrue(command.call_args_list[0].kwargs['force'])
+        self.assertEqual(command.call_args_list[1].args[0], 'fetch_nfl_winners')
+
+    @patch('survivorPool.management.commands.post_week_results.call_command')
+    @patch(
+        'survivorPool.management.commands.post_week_results.all_week_games_started',
+        return_value=False,
+    )
+    def test_post_results_refuses_while_games_are_available(self, games_started, command):
+        with self.assertRaisesMessage(
+            Exception,
+            'Week 1 still has games available',
+        ):
+            call_command('post_week_results', '--week=1')
+
+        command.assert_not_called()
 
 
 class ChatViewTests(TestCase):

@@ -55,6 +55,7 @@ class Pick(models.Model):
     is_win = models.BooleanField(null=True, blank=True, default=None)
     missed_deadline = models.BooleanField(
         default=False,
+        db_default=False,
         help_text="Auto-assigned loss when no pick was made before the final weekly kickoff.",
     )
 

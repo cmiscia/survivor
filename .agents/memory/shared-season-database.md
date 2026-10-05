@@ -17,4 +17,6 @@ winner update, inspect and count the affected Django ORM records. State the
 production impact explicitly and verify counts after the command. Browser and
 automated tests must explicitly clear the inherited Neon URL before supplying a
 local test database; otherwise Django's URL precedence connects the test seeder
-to the shared league database.
+to the shared league database. Replit Publish schema validation is separate: it
+diffs the managed development database against managed production, so a Django
+migration against Neon does not update the schema Publish introspects.

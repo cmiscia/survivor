@@ -48,12 +48,12 @@ async function expectReadableButton(page: Page, name: string) {
   expect(colors.color).not.toEqual(colors.background);
 }
 
-async function login(page: Page) {
+async function login(page: Page, username = 'browser_user') {
   await page.goto('/members/login/');
-  await page.locator('input[name="username"]').fill('browser_user');
+  await page.locator('input[name="username"]').fill(username);
   await page.locator('input[name="password"]').fill('Test4321!');
   await page.getByRole('button', { name: 'Login' }).click();
-  await expect(page.getByRole('heading', { name: /browser_user's Picks/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: `${username}'s Picks`, exact: true })).toBeVisible();
 }
 
 async function capture(page: Page, testInfo: TestInfo, name: string) {
@@ -126,8 +126,8 @@ test('authenticated navigation pages render cleanly', async ({ page }, testInfo)
 test('make a pick defaults to current week and supports outer weeks', async ({ page }, testInfo) => {
   const monitor = await watchPage(page);
 
-  await login(page);
-  await expect(page.locator('.pick-card')).toHaveCount(7);
+  await login(page, 'browser_picker');
+  await expect(page.locator('.pick-card')).toHaveCount(1);
   await expect(page.getByRole('link', { name: '+ Make a Pick' })).toBeVisible();
   await expectReadableButton(page, '+ Make a Pick');
 
