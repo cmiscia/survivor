@@ -904,6 +904,29 @@ class WinnersCommandTests(TestCase):
 
 
 class PostWeekResultsCommandTests(TestCase):
+    @patch('survivorPool.management.commands.fetch_nfl_winners.get_nfl_weekly_winners')
+    def test_combined_command_finalizes_and_scores_with_guards_enabled(self, winners):
+        bills = Team.objects.create(team_name='Bills')
+        dolphins = Team.objects.create(team_name='Dolphins')
+        picker = User.objects.create_user(username='picker')
+        absent = User.objects.create_user(username='absent')
+        pick = Pick.objects.create(user_name=picker, team=bills, week=3)
+        Game.objects.create(season_year=2026, week=3, home_team=bills,
+                            away_team=dolphins, game_time=timezone.now() - datetime.timedelta(hours=4))
+        winners.return_value = [{'winner': 'Buffalo Bills', 'loser': 'Miami Dolphins'}]
+
+        # Exercise the actual nested commands, not just their invocation order.
+        call_command('post_week_results', week=3)
+        call_command('post_week_results', week=3)
+
+        pick.refresh_from_db()
+        self.assertIs(pick.is_win, True)
+        missed = Pick.objects.get(user_name=absent, week=3)
+        self.assertTrue(missed.missed_deadline)
+        self.assertIs(missed.is_win, False)
+        self.assertEqual(WeekLockRun.objects.filter(season_year=2026, week=3).count(), 1)
+        self.assertEqual(ChatMessage.objects.filter(message_type=ChatMessage.MESSAGE_WEEKLY_LOCK, week=3).count(), 1)
+
     @patch('survivorPool.management.commands.post_week_results.call_command')
     @patch(
         'survivorPool.management.commands.post_week_results.all_week_games_started',
