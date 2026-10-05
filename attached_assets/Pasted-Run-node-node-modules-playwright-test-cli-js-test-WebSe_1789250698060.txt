@@ -1,0 +1,202 @@
+Run node node_modules/@playwright/test/cli.js test
+[WebServer] Watching for file changes with StatReloader
+[WebServer] [12/Sep/2026 17:03:57] "GET / HTTP/1.1" 200 2391
+
+Running 8 tests using 2 workers
+
+  ✘  1 [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:64:5 › anonymous pages render cleanly (1ms)
+  ✘  2 [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:64:5 › anonymous pages render cleanly (1ms)
+  ✘  3 [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:91:5 › authenticated navigation pages render cleanly (1ms)
+  ✘  4 [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:91:5 › authenticated navigation pages render cleanly (1ms)
+  ✘  6 [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:124:5 › make a pick defaults to current week and supports outer weeks (1ms)
+  ✘  5 [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:124:5 › make a pick defaults to current week and supports outer weeks (1ms)
+  ✘  7 [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:154:5 › mobile nav and league picks stay usable (1ms)
+  ✘  8 [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:154:5 › mobile nav and league picks stay usable (1ms)
+
+
+  1) [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:64:5 › anonymous pages render cleanly ───
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-anonymous-pages-render-cleanly-desktop-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-anonymous-pages-render-cleanly-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-anonymous-pages-render-cleanly-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:91:5 › authenticated navigation pages render cleanly 
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-authenticated-navigation-pages-render-cleanly-desktop-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-authenticated-navigation-pages-render-cleanly-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-authenticated-navigation-pages-render-cleanly-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:124:5 › make a pick defaults to current week and supports outer weeks 
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:154:5 › mobile nav and league picks stay usable 
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-mobile-nav-and-league-picks-stay-usable-desktop-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-mobile-nav-and-league-picks-stay-usable-desktop-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-mobile-nav-and-league-picks-stay-usable-desktop-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:64:5 › anonymous pages render cleanly ────
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-anonymous-pages-render-cleanly-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-anonymous-pages-render-cleanly-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-anonymous-pages-render-cleanly-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:91:5 › authenticated navigation pages render cleanly 
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-authenticated-navigation-pages-render-cleanly-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-authenticated-navigation-pages-render-cleanly-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-authenticated-navigation-pages-render-cleanly-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:124:5 › make a pick defaults to current week and supports outer weeks 
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-make-a-pick-3bfa4-ek-and-supports-outer-weeks-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:154:5 › mobile nav and league picks stay usable 
+
+    Error: browserType.launch: Executable doesn't exist at /home/runner/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/survivor-smoke-mobile-nav-and-league-picks-stay-usable-mobile-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/survivor-smoke-mobile-nav-and-league-picks-stay-usable-mobile-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/survivor-smoke-mobile-nav-and-league-picks-stay-usable-mobile-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8 failed
+    [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:64:5 › anonymous pages render cleanly ────
+    [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:91:5 › authenticated navigation pages render cleanly 
+    [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:124:5 › make a pick defaults to current week and supports outer weeks 
+    [desktop-chromium] › tests/e2e/survivor-smoke.spec.ts:154:5 › mobile nav and league picks stay usable 
+    [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:64:5 › anonymous pages render cleanly ─────
+    [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:91:5 › authenticated navigation pages render cleanly 
+    [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:124:5 › make a pick defaults to current week and supports outer weeks 
+    [mobile-chromium] › tests/e2e/survivor-smoke.spec.ts:154:5 › mobile nav and league picks stay usable 
+Error: Process completed with exit code 1.
